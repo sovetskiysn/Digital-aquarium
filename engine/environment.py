@@ -159,24 +159,6 @@ class Environment():
         self.average_energy_number = self.start_energy_of_agent
 
 
-    def calculate_average_genome(self, agents_list):
-
-        avr_genome = None
-        N = 0
-        for agent in agents_list:
-            agent.brain.genome
-            
-            if avr_genome is None:
-                avr_genome = agent.brain.genome
-            else:
-                avr_genome = (avr_genome * N + agent.brain.genome) // (N + 1)
-            N += 1
-
-        print(f'Average genome:')
-        print(np.round(avr_genome).astype(int))
-        print('--------------------------------')
-
-
     def make_step(self):
         
 

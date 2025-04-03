@@ -33,16 +33,9 @@ class DigitalAquariumApp():
         self.env.generate_random_landscape()
 
 
-
         # Первая популяция
         self.population_size = 30
         self.env.generate_random_agents(brain_class=Classic_NN_brain, number_of_agents=self.population_size)
-
-
-
-
-
-
 
 
         self.env.generate_foods(180)
@@ -70,6 +63,7 @@ class DigitalAquariumApp():
         df = pdd.DataFrame(columns=["Generation number", "Fitness-min", "Fitness-max", "Fitness-average", "Fitness-median", 
                                     "Number of natural death", "Number of violent death", 
                                     "Number of eaten food-min", "Number of eaten food-max", "Number of eaten food-average", "Number of eaten food-median"])
+        
 
         while self.env.number_of_generations <= 500:
                     
