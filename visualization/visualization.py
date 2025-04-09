@@ -126,7 +126,17 @@ class Visualization():
 
 
 
-    
+    def get_fps_control_flag(self):
+
+        if self.env_playing_flag:
+            self.play_speed = self.speed_slider.get_current_value()
+            self.play_speed_acc += self.time_delta
+            if self.play_speed_acc >= self.play_speed:
+                self.play_speed_acc = 0.0
+                return True
+
+        return False
+
 
     def process_gui_events(self):
             # Event loop

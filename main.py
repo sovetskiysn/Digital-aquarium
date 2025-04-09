@@ -8,6 +8,22 @@ from engine.brains import *
 from visualization.visualization import Visualization
 from visualization.parameters import *
 
+from applications import GeneticAlgorithmApp
+
+
+
+env_parameters = {'NUM_OF_TILE_ROWS': 30,
+                  'NUM_OF_TILE_COLS': 30,
+                  'POPULATION_SIZE': 50,
+                  'MAX_NUMBER_OF_FOODS':180,
+                  'NUMBER_OF_NEW_FOODS':10,
+                  'FOOD_NUTRIATION':30,
+                  'START_AGENT_ENERGY':30,
+                  'MAX_AGENT_AGE':float('inf')}
+
+
+ga_parameters ={'NUMBER_OF_GENERATIONS':100,
+                'MAX_ITERATION_NUMBER':10_000}
 
 
 class DigitalAquariumApp():
@@ -21,12 +37,14 @@ class DigitalAquariumApp():
         self.NUM_OF_TILE_COLS = NUM_OF_TILE_COLS
 
 
-
-        env_parameters = {'max_number_of_foods':180,
-                          'number_of_new_foods':10,
-                          'nutriation':30,
-                          'start_energy':30,
-                          'max_age':float('inf')}
+        env_parameters = {'NUM_OF_TILE_ROWS': 30,
+                  'NUM_OF_TILE_COLS': 30,
+                  'POPULATION_SIZE': 50,
+                  'MAX_NUMBER_OF_FOODS':180,
+                  'NUMBER_OF_NEW_FOODS':10,
+                  'FOOD_NUTRIATION':30,
+                  'START_AGENT_ENERGY':30,
+                  'MAX_AGENT_AGE':float('inf')}
 
         self.env = Environment(shape=(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS), parameters=env_parameters)
         
@@ -81,6 +99,7 @@ class DigitalAquariumApp():
             if self.vis.env_playing_flag:
                 self.vis.play_speed = self.vis.speed_slider.get_current_value()
                 self.vis.play_speed_acc += self.vis.time_delta
+                print(f'delta - {self.vis.time_delta}')
                 if self.vis.play_speed_acc >= self.vis.play_speed:
                     self.vis.play_speed_acc = 0.0
 
@@ -190,5 +209,8 @@ class DigitalAquariumApp():
 
             
 
-app = DigitalAquariumApp(30,30)
+# app = DigitalAquariumApp(30,30)
+# app.run()
+
+app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=True)
 app.run()

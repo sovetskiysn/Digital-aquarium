@@ -17,14 +17,14 @@ class Environment():
         self.number_of_generations = 1
         self.number_of_agents = 0
         self.number_of_foods = 0
-        self.average_energy_number = parameters['start_energy']
+        self.average_energy_number = parameters['START_AGENT_ENERGY']
 
         # Параметры среды
-        self.max_number_of_foods = parameters['max_number_of_foods']
-        self.number_of_new_foods = parameters['number_of_new_foods']
-        self.nutriation = parameters['nutriation']
-        self.start_energy_of_agent = parameters['start_energy']
-        self.max_age = parameters['max_age']
+        self.max_number_of_foods = parameters['MAX_NUMBER_OF_FOODS']
+        self.number_of_new_foods = parameters['NUMBER_OF_NEW_FOODS']
+        self.nutriation = parameters['FOOD_NUTRIATION']
+        self.start_energy_of_agent = parameters['START_AGENT_ENERGY']
+        self.max_age = parameters['MAX_AGENT_AGE']
 
 
 

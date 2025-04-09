@@ -197,9 +197,6 @@ class Classic_NN_brain(nn.Module):
 
         agent_surroundings = replace_func(agent_surroundings)
 
-        print(agent_surroundings.reshape((5, 5)))
-        print('---------')
-
         agent_surroundings = agent_surroundings.reshape(-1)
 
         return np.append(agent_surroundings, [agent.energy, agent.age])
