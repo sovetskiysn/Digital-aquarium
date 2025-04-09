@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pdd
+import pandas as pdd # She Knows, She Knows
 
 from engine.environment import Environment
 from engine.brains import *
@@ -47,17 +47,17 @@ class GeneticAlgorithmApp():
             self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
             self.vis.visualize_all(self.env)
 
+
+    def calculate_stats(self):
+        pass
+
     
     def run(self):
         
 
         mating_pool = np.empty((self.POPULATION_SIZE, 2), dtype=object)
-
-        agent_list = self.env.get_specific_entities(Agent, return_type='instance_list')
         mating_pool[:, 0] = 0
-        mating_pool[:, 1] = agent_list
-
-        generation_iteration_counter = 0
+        mating_pool[:, 1] = self.env.get_specific_entities(Agent, return_type='instance_list')
 
 
         
@@ -66,10 +66,12 @@ class GeneticAlgorithmApp():
                                     "Number of eaten food-min", "Number of eaten food-max", "Number of eaten food-average", "Number of eaten food-median"])
         
 
+        generation_counter = 0
+        iteration_counter = 0
 
         fps_control_flag = True
 
-        while self.env.number_of_generations <= 100:
+        while generation_counter <= self.env.number_of_generations:
                     
 
             
@@ -87,23 +89,20 @@ class GeneticAlgorithmApp():
             if fps_control_flag:
                 
                 # Сначала выполняем 1 шаг/итерацию среды 
-                agent_list_after_performing_action = self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
+                self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
+
+                iteration_counter += 1
 
 
 
+                if self.env.number_of_agents <= 0 or iteration_counter >= 10000:
 
-                generation_iteration_counter += 1
-
-                # print(f'generation_iteration_counter - {generation_iteration_counter}')
-
-
-                if self.env.number_of_agents <= 0 or generation_iteration_counter >= 10000:
+                    
 
                     self.env.kill_all_agents()
 
-                    generation_iteration_counter = 0
 
-                    
+
 
                     for agent in mating_pool[:, 1]:
 
@@ -120,6 +119,8 @@ class GeneticAlgorithmApp():
                         # обновляем его значение fitness
                         mating_pool[index, 0] = fitness_value
 
+
+                    self.calculate_stats()
 
                     generation_number = self.env.number_of_generations
 
@@ -168,7 +169,12 @@ class GeneticAlgorithmApp():
 
 
 
-                    self.env.number_of_generations += 1
+
+                    iteration_counter = 0
+                    generation_counter += 1
+
+                iteration_counter += 1
+
 
             if self.visualization_flag:
                 # рисуем парашу

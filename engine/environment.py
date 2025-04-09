@@ -14,10 +14,8 @@ class Environment():
 
         # статистики
         self.step_counter = 0
-        self.number_of_generations = 1
         self.number_of_agents = 0
         self.number_of_foods = 0
-        self.average_energy_number = parameters['START_AGENT_ENERGY']
 
         # Параметры среды
         self.max_number_of_foods = parameters['MAX_NUMBER_OF_FOODS']
