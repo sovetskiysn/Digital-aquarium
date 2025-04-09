@@ -1,13 +1,3 @@
-import numpy as np
-import pandas as pdd
-
-from engine.environment import Environment
-from engine.brains import *
-
-
-from visualization.visualization import Visualization
-from visualization.parameters import *
-
 from applications import GeneticAlgorithmApp
 
 

@@ -212,7 +212,7 @@ class Visualization():
     
 
     
-    def visualize_all(self, env):
+    def visualize_all(self, env, stats):
     
         # ----------GUI
 
@@ -222,9 +222,9 @@ class Visualization():
 
         self.number_of_agents_label.set_text(f"# of live agents: {env.number_of_agents}")
         self.number_of_foods_label.set_text(f"# of foods: {env.number_of_foods}")
-        self.number_of_avg_energy_label.set_text(f"Avg of energy: {env.average_energy_number}")
+        # self.number_of_avg_energy_label.set_text(f"Avg of energy: {stats['average_energy_number']}")
 
-        self.number_of_generations.set_text(f"# of Gen: {env.number_of_generations}")
+        self.number_of_generations.set_text(f"# of Gen: {stats['number_of_generations']}")
 
 
 

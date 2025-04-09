@@ -1,4 +1,4 @@
-import numpy as np
+import torch
 import pandas as pdd # She Knows, She Knows
 
 from engine.environment import Environment
@@ -44,20 +44,97 @@ class GeneticAlgorithmApp():
 
 
         if visualization_flag:
+            stats ={'average_energy_number': env_parameters['START_AGENT_ENERGY'],
+                    'number_of_generations': 0}
             self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
-            self.vis.visualize_all(self.env)
+            self.vis.visualize_all(self.env, stats)
 
 
-    def calculate_stats(self):
-        pass
+    def calculate_stats(self, agent_list, generation_number):
+        
+
+        fitness_list = [self.fitness_function(agent) for agent in agent_list]
+        fitness_min = np.min(fitness_list)
+        fitness_max = np.max(fitness_list)
+        fitness_average = np.average(fitness_list)
+        fitness_median = np.median(fitness_list)
+
+
+        number_of_natural_death = sum([int(agent.natural_death) for agent in agent_list])
+        number_of_violent_death = sum([int(agent.be_eaten) for agent in agent_list])
+
+
+        number_of_eaten_food_list = [agent.number_of_eaten_food for agent in agent_list]
+        number_of_eaten_food_min = np.min(number_of_eaten_food_list)
+        number_of_eaten_food_max = np.max(number_of_eaten_food_list)
+        number_of_eaten_food_average = np.average(number_of_eaten_food_list)
+        number_of_eaten_food_median = np.median(number_of_eaten_food_list)
+
+
+        age_list = [agent.age for agent in agent_list]
+        age_min = np.min(age_list)
+        age_max = np.max(age_list)
+        age_average = np.average(age_list)
+        age_median = np.median(age_list)
+
+        energy_list = [agent.age for agent in agent_list]
+        energy_min = np.min(energy_list)
+        energy_max = np.max(energy_list)
+        energy_average = np.average(energy_list)
+        energy_median = np.median(energy_list)
+
+
+
+        return [fitness_min, fitness_max, fitness_average, fitness_median, 
+                                number_of_natural_death, number_of_violent_death,
+                                number_of_eaten_food_min, number_of_eaten_food_max, number_of_eaten_food_average, number_of_eaten_food_median]
+
+    def fitness_function(self, agent: Type[Agent]):
+        return agent.age + agent.energy // 2
+    
+
+    def fitness_proportionate_selection(self, agent_list):
+        
+
+        fitness_list = [self.fitness_function(agent) for agent in agent_list]
+
+        return agent_list, [i/sum(fitness_list) for i in fitness_list]
+    
+    def uniform_crossover(self, agent_list, probabilities, new_gen_size):
+
+
+        brains = []
+        for i in range(new_gen_size):
+            # SELECTION
+            parent1_index = np.random.choice(len(agent_list), p=probabilities)
+            parent2_index = np.random.choice(len(agent_list), p=probabilities)
+
+            parent1 = agent_list[parent1_index]
+            parent2 = agent_list[parent2_index]
+
+
+            # CROSSOVER
+            offspring_genome = {}
+            for key in parent1.genome:
+
+                # Однородное скрещивание: случайный выбор веса от одного из родителей
+                mask = torch.randint(0, 2, parent1.genome[key].shape, dtype=torch.bool)
+                offspring_genome[key] = torch.where(mask, parent1.genome[key], parent2.genome[key])
+
+            
+            offspring_brain = parent1.brain.__class__(genome = offspring_genome)
+
+            brains.append(offspring_brain)
+
+        return brains
+
 
     
     def run(self):
         
 
-        mating_pool = np.empty((self.POPULATION_SIZE, 2), dtype=object)
-        mating_pool[:, 0] = 0
-        mating_pool[:, 1] = self.env.get_specific_entities(Agent, return_type='instance_list')
+
+        all_agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
 
         
@@ -71,7 +148,7 @@ class GeneticAlgorithmApp():
 
         fps_control_flag = True
 
-        while generation_counter <= self.env.number_of_generations:
+        while generation_counter <= self.number_of_generations:
                     
 
             
@@ -104,68 +181,36 @@ class GeneticAlgorithmApp():
 
 
 
-                    for agent in mating_pool[:, 1]:
+                    # for agent in mating_pool[:, 1]:
 
-                        fitness_value = agent.age
+                    #     fitness_value = agent.age
 
-                        # если агент умер то добавляем количество энергий которое было у него при смерти
-                        if agent.is_alive == False:
-                            fitness_value += agent.energy // 2
+                    #     # если агент умер то добавляем количество энергий которое было у него при смерти
+                    #     if agent.is_alive == False:
+                    #         fitness_value += agent.energy // 2
 
                         
-                        # находим агента в mating_pool
-                        index = np.where([agentj is agent for agentj in mating_pool[:, 1]])[0]
+                    #     # находим агента в mating_pool
+                    #     index = np.where([agentj is agent for agentj in mating_pool[:, 1]])[0]
 
-                        # обновляем его значение fitness
-                        mating_pool[index, 0] = fitness_value
-
-
-                    self.calculate_stats()
-
-                    generation_number = self.env.number_of_generations
+                    #     # обновляем его значение fitness
+                    #     mating_pool[index, 0] = fitness_value
 
 
-                    fitness_min = np.min(mating_pool[:, 0])
-                    fitness_max = np.max(mating_pool[:, 0])
-                    fitness_average = np.average(mating_pool[:, 0])
-                    fitness_median = np.median(mating_pool[:, 0])
+                    self.calculate_stats(all_agents_list, generation_counter)
 
+                    mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
 
-                    number_of_natural_death = sum([int(agent.natural_death) for agent in mating_pool[:, 1]])
-                    number_of_violent_death = sum([int(agent.be_eaten) for agent in mating_pool[:, 1]])
+                    new_agents_brains = self.uniform_crossover(mating_pool, probabilities, new_gen_size=100)
 
-
-                    number_of_eaten_food_list = [agent.number_of_eaten_food for agent in mating_pool[:, 1]]
-                    number_of_eaten_food_min = np.min(number_of_eaten_food_list)
-                    number_of_eaten_food_max = np.max(number_of_eaten_food_list)
-                    number_of_eaten_food_average = np.average(number_of_eaten_food_list)
-                    number_of_eaten_food_median = np.median(number_of_eaten_food_list)
-
-
-                    age_list = [agent.age for agent in mating_pool[:, 1]]
-                    age_min = np.min(age_list)
-                    age_max = np.max(age_list)
-                    age_average = np.average(age_list)
-                    age_median = np.median(age_list)
+                    self.env.distribute_agents_on_map(new_agents_brains)
 
 
 
-                    df.loc[len(df)] = [generation_number, fitness_min, fitness_max, fitness_average, fitness_median, 
-                                number_of_natural_death, number_of_violent_death,
-                                number_of_eaten_food_min, number_of_eaten_food_max, number_of_eaten_food_average, number_of_eaten_food_median]
-
-
-                    print([generation_number, fitness_min, fitness_max, fitness_average, fitness_median, 
-                                number_of_natural_death, number_of_violent_death,
-                                number_of_eaten_food_min, number_of_eaten_food_max, number_of_eaten_food_average, number_of_eaten_food_median])
-
-
-                    self.env.create_new_generation(mating_pool, new_gen_size = self.POPULATION_SIZE)
+                    # self.env.create_new_generation(mating_pool, new_gen_size = self.POPULATION_SIZE)
 
 
                     agent_list = self.env.get_specific_entities(Agent, return_type='instance_list')
-                    mating_pool[:, 0] = 0
-                    mating_pool[:, 1] = agent_list
 
 
 
@@ -177,8 +222,9 @@ class GeneticAlgorithmApp():
 
 
             if self.visualization_flag:
+                stats ={'number_of_generations': generation_counter}
                 # рисуем парашу
-                self.vis.visualize_all(self.env)
+                self.vis.visualize_all(self.env, stats)
                         
 
         df.to_excel("output.xlsx", index=False)

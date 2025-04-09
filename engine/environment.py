@@ -94,6 +94,22 @@ class Environment():
         
 
 
+    def distribute_agents_on_map(self, brain_list):
+
+        coord_list = self.get_specific_entities((Grass, Dirt), return_type='coord_list')
+
+        if len(coord_list) != 0:
+
+            indexes = np.random.choice(len(coord_list), len(brain_list), replace=False)
+
+
+            for i, brain in zip(indexes, brain_list):
+                
+                self.set_agent_at_location(coord_list[i], brain=brain)
+
+
+
+
 
     def create_new_generation(self, mating_pool, new_gen_size: int):
 
