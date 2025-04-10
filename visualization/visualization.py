@@ -117,7 +117,7 @@ class Visualization():
 
         # Control Panel - Speed slider
         temp_rect = pygame.Rect((10, 30 + 10 + 30 + 10 + 40 + 10), (140, 25))
-        self.speed_slider = UIHorizontalSlider(temp_rect, start_value=self.play_speed, value_range=(0.6, 0.01), object_id = ObjectID(class_id='Slider'),manager=self.ui_manager, container=self.sim_panel)
+        self.speed_slider = UIHorizontalSlider(temp_rect, start_value=self.play_speed, value_range=(0.6, 0.0001), object_id = ObjectID(class_id='Slider'),manager=self.ui_manager, container=self.sim_panel)
 
 
 
