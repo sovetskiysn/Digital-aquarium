@@ -131,9 +131,6 @@ class GeneticAlgorithmApp():
 
     
     def run(self):
-        
-
-
         all_agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
 
@@ -168,49 +165,22 @@ class GeneticAlgorithmApp():
                 # Сначала выполняем 1 шаг/итерацию среды 
                 self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
 
-                iteration_counter += 1
-
-
-
                 if self.env.number_of_agents <= 0 or iteration_counter >= 10000:
 
                     
 
                     self.env.kill_all_agents()
 
-
-
-
-                    # for agent in mating_pool[:, 1]:
-
-                    #     fitness_value = agent.age
-
-                    #     # если агент умер то добавляем количество энергий которое было у него при смерти
-                    #     if agent.is_alive == False:
-                    #         fitness_value += agent.energy // 2
-
-                        
-                    #     # находим агента в mating_pool
-                    #     index = np.where([agentj is agent for agentj in mating_pool[:, 1]])[0]
-
-                    #     # обновляем его значение fitness
-                    #     mating_pool[index, 0] = fitness_value
-
-
                     self.calculate_stats(all_agents_list, generation_counter)
 
                     mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
 
-                    new_agents_brains = self.uniform_crossover(mating_pool, probabilities, new_gen_size=100)
+                    new_agents_brains = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
 
                     self.env.distribute_agents_on_map(new_agents_brains)
 
 
-
-                    # self.env.create_new_generation(mating_pool, new_gen_size = self.POPULATION_SIZE)
-
-
-                    agent_list = self.env.get_specific_entities(Agent, return_type='instance_list')
+                    all_agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
 
 
