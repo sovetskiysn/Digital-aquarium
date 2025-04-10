@@ -171,7 +171,10 @@ class GeneticAlgorithmApp():
 
                     self.env.kill_all_agents()
 
-                    self.calculate_stats(all_agents_list, generation_counter)
+                    stats = self.calculate_stats(all_agents_list, generation_counter)
+
+                    df.loc[len(df)] = [generation_counter] + stats
+                    print([generation_counter] + stats)
 
                     mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
 
