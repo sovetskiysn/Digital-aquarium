@@ -13,4 +13,6 @@ Sovet Sanzhar, Nurakhov Edil, Aitolkyn Kulmuratova, Evolution of agents in a vir
 
 ![Демо анимация](images/Show.gif)
 
+![Сертификат](images/certificate.jpg)
+
 Python 3.12.5
