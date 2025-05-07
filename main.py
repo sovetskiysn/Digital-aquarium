@@ -4,7 +4,7 @@ from applications import GeneticAlgorithmApp
 
 env_parameters = {'NUM_OF_TILE_ROWS': 30,
                   'NUM_OF_TILE_COLS': 30,
-                  'POPULATION_SIZE': 30,
+                  'POPULATION_SIZE': 50,
                   'MAX_NUMBER_OF_FOODS':100,
                   'NUMBER_OF_NEW_FOODS':10,
                   'FOOD_NUTRIATION':30,
