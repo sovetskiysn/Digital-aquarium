@@ -17,5 +17,5 @@ ga_parameters ={'NUMBER_OF_GENERATIONS':500,
 
 
 
-app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=False)
+app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=True)
 app.run()

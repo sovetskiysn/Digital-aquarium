@@ -77,7 +77,7 @@ class GeneticAlgorithmApp():
         age_average = np.average(age_list)
         age_median = np.median(age_list)
 
-        energy_list = [agent.age for agent in agent_list]
+        energy_list = [agent.energy for agent in agent_list]
         energy_min = np.min(energy_list)
         energy_max = np.max(energy_list)
         energy_average = np.average(energy_list)
@@ -143,6 +143,9 @@ class GeneticAlgorithmApp():
         generation_counter = 0
         iteration_counter = 0
 
+        stats ={'average_energy_number': self.env.start_energy_of_agent,
+                'number_of_generations': 0}
+
         fps_control_flag = True
 
         while generation_counter <= self.number_of_generations:
@@ -163,7 +166,7 @@ class GeneticAlgorithmApp():
             if fps_control_flag:
                 
                 # Сначала выполняем 1 шаг/итерацию среды 
-                self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
+                current_agent_list = self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
 
                 if self.env.number_of_agents <= 0 or iteration_counter >= 10000:
 
@@ -171,10 +174,10 @@ class GeneticAlgorithmApp():
 
                     self.env.kill_all_agents()
 
-                    stats = self.calculate_stats(all_agents_list, generation_counter)
+                    statsy = self.calculate_stats(all_agents_list, generation_counter)
 
-                    df.loc[len(df)] = [generation_counter] + stats
-                    print([generation_counter] + stats)
+                    df.loc[len(df)] = [generation_counter] + statsy
+                    print([generation_counter] + statsy)
 
                     mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
 
@@ -186,16 +189,18 @@ class GeneticAlgorithmApp():
                     all_agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
 
-
-
                     iteration_counter = 0
                     generation_counter += 1
 
                 iteration_counter += 1
 
+                energy_list = [agent.energy for agent in current_agent_list]
+
+                stats['average_energy_number'] = int(np.average(energy_list))
+                stats['number_of_generations'] = generation_counter
+
 
             if self.visualization_flag:
-                stats ={'number_of_generations': generation_counter}
                 # рисуем парашу
                 self.vis.visualize_all(self.env, stats)
                         
