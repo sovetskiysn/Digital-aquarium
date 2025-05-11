@@ -38,6 +38,8 @@ class Wall(Entity):
 
 class Food(Entity):
 
+    number_of_foods = 0
+
     def __init__(self, coord: tuple, env):
         super().__init__(coord)
 
@@ -46,7 +48,10 @@ class Food(Entity):
 
         self.age = 0
 
+        Food.number_of_foods += 1
+
     def got_bitten(self):
+        Food.number_of_foods -= 1
         return self.nutriation
     
 
@@ -55,6 +60,7 @@ class Food(Entity):
         self.age += 1
 
         if self.age >= 100:
+            Food.number_of_foods -= 1
             env_link.world_grid[self.row,self.col] = self.under_entity_reference
 
 

@@ -243,21 +243,19 @@ class OpenEndedApp():
 
 
 
-        if visualization_flag:
-            stats ={'average_energy_number': env_parameters['START_AGENT_ENERGY'],
-                    'number_of_generations': 0}
+        if visualization_flag:            
+            self.stats = {'# of steps': 0,
+                          '# of live agents': Agent.number_of_agents,
+                          '# of foods': self.MAX_NUMBER_OF_FOODS,
+                          'Avg of energy': env_parameters['START_AGENT_ENERGY'],
+                          '# of Gen': 0}
             self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
-            self.vis.visualize_all(self.env, stats)
+            self.vis.visualize_all(self.env, self.stats)
 
 
     
     def run(self):
 
-
-
-        
-        stats ={'average_energy_number': self.env.start_energy_of_agent,
-                'number_of_generations': 0}
 
         fps_control_flag = True
 
@@ -289,8 +287,6 @@ class OpenEndedApp():
                     self.env.distribute_agents_on_map([Programmatic_brain(genome=self.viable_genome)])
                     generation_counter += 1
                     
-                energy_list = [agent.energy for agent in current_agent_list]
-
 
                 agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
@@ -304,13 +300,20 @@ class OpenEndedApp():
 
 
 
-                stats['average_energy_number'] = int(np.average(energy_list))
-                stats['number_of_generations'] = generation_counter
+                self.stats['Avg of energy'] = int(np.average([agent.energy for agent in agents_list]))
+                # self.stats['# of Gen'] = generation_counter
+
 
 
             if self.visualization_flag:
+
+                self.stats['# of steps'] = self.env.step_counter
+                self.stats['# of live agents'] = Agent.number_of_agents
+                self.stats['# of foods'] = Food.number_of_foods
+                self.stats['# of Gen'] = generation_counter
+
                 # рисуем парашу
-                self.vis.visualize_all(self.env, stats)
+                self.vis.visualize_all(self.env, self.stats)
                         
 
 

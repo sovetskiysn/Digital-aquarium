@@ -218,16 +218,15 @@ class Visualization():
 
         # Labels
         self.fps_label.set_text(f"FPS: {round(self.clock.get_fps())}")
-        self.step_label.set_text(f"# of steps: {env.step_counter}")
 
-        self.number_of_agents_label.set_text(f"# of live agents: {Agent.number_of_agents}") # env.number_of_agents
-        self.number_of_foods_label.set_text(f"# of foods: {env.number_of_foods}")
-        self.number_of_avg_energy_label.set_text(f"Avg of energy: {stats['average_energy_number']}")
 
-        self.number_of_generations.set_text(f"# of Gen: {stats['number_of_generations']}")
+        self.step_label.set_text(f"# of steps: {stats['# of steps']}")
 
-        if stats['number_of_generations'] == 3:
-            pygame.image.save(self.screen, "screenshot.png")
+        self.number_of_agents_label.set_text(f"# of live agents: {stats['# of live agents']}") # env.number_of_agents
+        self.number_of_foods_label.set_text(f"# of foods: {stats['# of foods']}")
+        self.number_of_avg_energy_label.set_text(f"Avg of energy: {stats['Avg of energy']}")
+        self.number_of_generations.set_text(f"# of Gen: {stats['# of Gen']}")
+
 
 
 
