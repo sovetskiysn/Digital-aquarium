@@ -220,7 +220,7 @@ class Visualization():
         self.fps_label.set_text(f"FPS: {round(self.clock.get_fps())}")
         self.step_label.set_text(f"# of steps: {env.step_counter}")
 
-        self.number_of_agents_label.set_text(f"# of live agents: {env.number_of_agents}")
+        self.number_of_agents_label.set_text(f"# of live agents: {Agent.number_of_agents}") # env.number_of_agents
         self.number_of_foods_label.set_text(f"# of foods: {env.number_of_foods}")
         self.number_of_avg_energy_label.set_text(f"Avg of energy: {stats['average_energy_number']}")
 

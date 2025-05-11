@@ -214,31 +214,104 @@ class GeneticAlgorithmApp():
 
 
 
+
 class OpenEndedApp():
-    def __init__(self, parameters):
+    def __init__(self, env_parameters, visualization_flag=True, excel_flag=True):
 
-        self.NUM_OF_TILE_ROWS = parameters['NUM_OF_TILE_ROWS']
-        self.NUM_OF_TILE_COLS = parameters['NUM_OF_TILE_COLS']
 
-        self.POPULATION_SIZE = parameters['POPULATION_SIZE']
-        self.MAX_NUMBER_OF_FOODS = parameters['MAX_NUMBER_OF_FOODS']
+        # App parameters
+        self.visualization_flag = visualization_flag
 
-        self.env = Environment(shape=(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS), parameters=parameters)
+        self.NUM_OF_TILE_ROWS = env_parameters['NUM_OF_TILE_ROWS']
+        self.NUM_OF_TILE_COLS = env_parameters['NUM_OF_TILE_COLS']
+        self.POPULATION_SIZE = env_parameters['POPULATION_SIZE']
+        self.MAX_NUMBER_OF_FOODS = env_parameters['MAX_NUMBER_OF_FOODS']
+
+
+        self.env = Environment(shape=(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS), parameters=env_parameters)
 
         self.env.generate_random_landscape()
 
 
         # Первая популяция
-        self.env.generate_random_agents(brain_class=Classic_NN_brain, number_of_agents=self.POPULATION_SIZE)
+        coord = (self.NUM_OF_TILE_ROWS-1, self.NUM_OF_TILE_COLS-1)
+        self.viable_genome = np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
+        print(self.viable_genome)
+        self.env.set_agent_at_location(coord, brain=Programmatic_brain(genome=self.viable_genome))
+
         self.env.generate_foods(self.MAX_NUMBER_OF_FOODS)
 
 
 
-        self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
-        self.vis.visualize_all(self.env)
+        if visualization_flag:
+            stats ={'average_energy_number': env_parameters['START_AGENT_ENERGY'],
+                    'number_of_generations': 0}
+            self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
+            self.vis.visualize_all(self.env, stats)
+
 
     
-    def run(self, visualization_flag=True):
-        pass
+    def run(self):
+
+
+
+        
+        stats ={'average_energy_number': self.env.start_energy_of_agent,
+                'number_of_generations': 0}
+
+        fps_control_flag = True
+
+        generation_counter = 1
+
+        while True:
+                    
+
+            
+            if self.visualization_flag:
+
+                # Нужно чтобы работал speed slider
+                self.vis.calculate_time_delta()
+
+                # кнопки жмяк
+                self.vis.process_gui_events()
+                
+                fps_control_flag = self.vis.get_fps_control_flag()
+
+            
+            if fps_control_flag:
+                
+                # Сначала выполняем 1 шаг/итерацию среды 
+                current_agent_list = self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
+
+                if self.env.number_of_agents <= 0:
+                    
+                    # print('НОВАЯ ГЕНЕРАЦИЯ')
+                    self.env.distribute_agents_on_map([Programmatic_brain(genome=self.viable_genome)])
+                    generation_counter += 1
+                    
+                energy_list = [agent.energy for agent in current_agent_list]
+                print(f'len(current_agent_list) - {len(current_agent_list)}')
+
+                print(f'current_agent_list[0].genome - {current_agent_list[0].genome}')
+                print(f'current_agent_list[0].energy - {current_agent_list[0].energy}')
+                print(f'current_agent_list[0].is_alive - {current_agent_list[0].is_alive}')
+                print(f'current_agent_list[0].natural_death - {current_agent_list[0].natural_death}')
+                print(f'current_agent_list[0].be_eaten - {current_agent_list[0].be_eaten}')
+
+
+
+
+
+
+                stats['average_energy_number'] = int(np.average(energy_list))
+                stats['number_of_generations'] = generation_counter
+
+
+            if self.visualization_flag:
+                # рисуем парашу
+                self.vis.visualize_all(self.env, stats)
+                        
+
+
 
 

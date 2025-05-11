@@ -82,6 +82,10 @@ class Agent(Entity):
         8: (0, -1)
     }
 
+    number_of_agents = 0
+    number_of_natural_deaths = 0
+    number_of_violent_deaths = 0
+
 
     def __init__(self, coord: tuple ,brain, env):
         super().__init__(coord)
@@ -114,6 +118,8 @@ class Agent(Entity):
         
         self.age = 0
         self.is_alive = True
+
+        Agent.number_of_agents += 1
 
 
 
@@ -164,11 +170,21 @@ class Agent(Entity):
 
         croped_world_grid = world_grid_link[top_boundary:bottom_boundary,left_boundary:right_boundary]
 
+        if len(croped_world_grid) == 0:
+
+            print(f'coord - ({row},{col})')
+
+            print('---------')
+            print(f'top_boundary - {top_boundary}')
+            print(f'bottom_boundary - {bottom_boundary}')
+            print(f'left_boundary - {left_boundary}')
+            print(f'right_boundary - {right_boundary}')
+
         # function
-        vectorized_func = np.vectorize(lambda entity: isinstance(entity, entity_type))
+        vectorized_func = np.vectorize(lambda entity: isinstance(entity, entity_type), otypes=[object])
         true_false_grid = vectorized_func(croped_world_grid)
         
-        if return_type == 'instance_list':
+        if return_type == 'instance_list':  
         
             return croped_world_grid[true_false_grid]
 
@@ -180,8 +196,12 @@ class Agent(Entity):
 
             indexes = np.argwhere(true_false_grid)
 
-            indexes[:, 0] += int((top_boundary + bottom_boundary-1) / 2)
-            indexes[:, 1] += int((left_boundary + right_boundary-1) / 2)
+            # indexes[:, 0] += int((top_boundary + bottom_boundary-1) / 2)
+            # indexes[:, 1] += int((left_boundary + right_boundary-1) / 2)
+
+
+            indexes[:, 0] += self.row - distance
+            indexes[:, 1] += self.col - distance
 
             return indexes
 
@@ -191,12 +211,14 @@ class Agent(Entity):
 
 
     def reproduce_if_possible(self):
+        
+        # print(f'Начал размножение |  coord - {self.coord}')
 
         available_locations_list = self.get_surrounding_locations((Grass, Dirt), return_type='coord_list')
 
+        # print(f'available_locations_list - {len(available_locations_list)}')
         
-
-        if len(available_locations_list) != 0 and self.energy <= self.env_link.start_energy_of_agent:
+        if len(available_locations_list) > 0 and self.energy >= self.env_link.start_energy_of_agent: 
 
             random_index = np.random.choice(len(available_locations_list), 1, replace=False)
 
@@ -208,15 +230,21 @@ class Agent(Entity):
             # Создаем новый мозг для этого агента с возможными мутациями
             descendent_brain = self.brain.__class__(genome = self.brain.get_copy_of_genome())
 
+            self.env_link.set_agent_at_location((target_row, target_col), brain=descendent_brain)
+
             # Создаем оболочку Агента
-            self.env_link.world_grid[target_row, target_col] = Agent((target_row, target_col), brain=descendent_brain, env=self.env_link)
-
-
+            # self.env_link.world_grid[target_row, target_col] = Agent((target_row, target_col), brain=descendent_brain, env=self.env_link)
 
             self.energy //= 2
 
+            # print(f'Закончил размножение |  target - ({target_row},{target_col})')
+
         else:
             self.die_or_harakiri()
+            # print(f'Закончил размножение |  умер')
+
+        
+
 
     
     def bite_if_possible(self, direction: int):
@@ -254,6 +282,8 @@ class Agent(Entity):
 
     def photosynthesis(self):
         self.energy += self.env_link.photosynthesis_energy
+
+        # print(f'Сделал фотосинтез |  coord - {self.coord}')
 
 
     def move_if_possible(self, direction: int):
@@ -328,19 +358,24 @@ class Agent(Entity):
 
     def check_is_alive(self):
 
-        self.is_alive = (self.energy > 0 and self.age <= self.max_age) and self.is_alive == True
 
         if (self.energy > 0 and self.age <= self.max_age) == False:
-
             self.natural_death = True
+
+        self.is_alive = (self.energy > 0 and self.age <= self.max_age) and self.is_alive == True
+
 
         return self.is_alive
     
     def die_or_harakiri(self):
+        
         self.is_alive = False
         self.env_link.world_grid[self.row,self.col] = self.under_entity_reference
 
+        Agent.number_of_agents -= 1
+
     def got_bitten(self):
+        Agent.number_of_agents -= 1
         self.is_alive = False
         self.be_eaten = True
         return self.energy//2

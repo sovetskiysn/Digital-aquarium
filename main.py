@@ -1,4 +1,4 @@
-from applications import GeneticAlgorithmApp
+from applications import *
 
 
 
@@ -9,6 +9,7 @@ env_parameters = {'NUM_OF_TILE_ROWS': 30,
                   'NUMBER_OF_NEW_FOODS':10,
                   'FOOD_NUTRIATION':30,
                   'START_AGENT_ENERGY':30,
+                  'PHOTOSYNTHESIS_ENERGY':3,
                   'MAX_AGENT_AGE':float('inf')}
 
 
@@ -17,5 +18,9 @@ ga_parameters ={'NUMBER_OF_GENERATIONS':500,
 
 
 
-app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=True)
+# app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=True)
+# app.run()
+
+
+app = OpenEndedApp(env_parameters, visualization_flag=True)
 app.run()

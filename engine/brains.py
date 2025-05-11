@@ -27,10 +27,10 @@ class Programmatic_brain:
     # Геном это та вещь которая будет подвержина мутациям и будет передаваться по наследству
     # Мозг это та вещь которая помогает боту выбрать действие, это как обработчик генома
 
-    def __init__(self, genome = None):
+    def __init__(self, genome = None, length_of_genome = 16):
 
         self.counter = 0
-        self.length_of_genome = 16
+        self.length_of_genome = length_of_genome
 
         # genome это umpy array
         self.genome = genome if genome is not None else self.generate_random_genome()

@@ -22,6 +22,7 @@ class Environment():
         self.number_of_new_foods = parameters['NUMBER_OF_NEW_FOODS']
         self.nutriation = parameters['FOOD_NUTRIATION']
         self.start_energy_of_agent = parameters['START_AGENT_ENERGY']
+        self.photosynthesis_energy = parameters['PHOTOSYNTHESIS_ENERGY']
         self.max_age = parameters['MAX_AGENT_AGE']
 
 
