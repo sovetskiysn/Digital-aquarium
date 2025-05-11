@@ -44,7 +44,7 @@ class Programmatic_brain:
     def get_the_chosen_action(self, agent: Type[Agent]):
 
         
-        action_function = None
+        action_function = agent.do_nothing
 
 
 
@@ -60,14 +60,14 @@ class Programmatic_brain:
 
             # Move and bite absolutely
             elif 1 <= command <= 8:        
-                action_function = partial(agent.move_and_bite_if_possible, direction=command)
+                action_function = partial(agent.bite_if_possible, direction=command)
                 self.move_the_counter(1)
                 break
 
             # Move and bite relatively
             elif command == 9:
                 next_command = self.genome[(self.counter + 1) % self.length_of_genome]
-                action_function = partial(agent.move_and_bite_if_possible, direction = (next_command % 8) + 1)
+                action_function = partial(agent.bite_if_possible, direction = (next_command % 8) + 1)
                 self.move_the_counter(2)
                 break
 

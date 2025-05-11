@@ -16,3 +16,10 @@ Sovet Sanzhar, Nurakhov Edil, Aitolkyn Kulmuratova, Evolution of agents in a vir
 ![Сертификат](images/certificate.jpg)
 
 Python 3.12.5
+
+
+
+Моменты над которыми надо подумать:
++ баг с (-2, ??) координатами
++ обновление статистики
++ 

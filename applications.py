@@ -234,7 +234,7 @@ class OpenEndedApp():
 
 
         # Первая популяция
-        coord = (self.NUM_OF_TILE_ROWS-1, self.NUM_OF_TILE_COLS-1)
+        coord = (self.NUM_OF_TILE_ROWS//2, self.NUM_OF_TILE_COLS//2)
         self.viable_genome = np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
         print(self.viable_genome)
         self.env.set_agent_at_location(coord, brain=Programmatic_brain(genome=self.viable_genome))
@@ -290,16 +290,17 @@ class OpenEndedApp():
                     generation_counter += 1
                     
                 energy_list = [agent.energy for agent in current_agent_list]
-                print(f'len(current_agent_list) - {len(current_agent_list)}')
-
-                print(f'current_agent_list[0].genome - {current_agent_list[0].genome}')
-                print(f'current_agent_list[0].energy - {current_agent_list[0].energy}')
-                print(f'current_agent_list[0].is_alive - {current_agent_list[0].is_alive}')
-                print(f'current_agent_list[0].natural_death - {current_agent_list[0].natural_death}')
-                print(f'current_agent_list[0].be_eaten - {current_agent_list[0].be_eaten}')
 
 
+                agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
+
+                # print(f'{self.env.number_of_agents == Agent.number_of_agents} - {self.env.number_of_agents} == { Agent.number_of_agents}')
+
+                # flag = self.env.number_of_agents == Agent.number_of_agents
+
+                # if flag == False:
+                #     print(f'Количество живых: {sum([int(agent.is_alive) for agent in agents_list])}')
 
 
 
