@@ -211,12 +211,8 @@ class Agent(Entity):
 
 
     def reproduce_if_possible(self):
-        
-        # print(f'Начал размножение |  coord - {self.coord}')
 
         available_locations_list = self.get_surrounding_locations((Grass, Dirt), return_type='coord_list')
-
-        # print(f'available_locations_list - {len(available_locations_list)}')
         
         if len(available_locations_list) > 0 and self.energy >= self.env_link.start_energy_of_agent:  
 
@@ -225,14 +221,10 @@ class Agent(Entity):
             target_row = available_locations_list[random_index][0][0]
             target_col = available_locations_list[random_index][0][1]
 
-            
-
             # Создаем новый мозг для этого агента с возможными мутациями
             descendent_brain = self.brain.__class__(genome = self.brain.get_copy_of_genome())
 
             self.env_link.set_agent_at_location((target_row, target_col), brain=descendent_brain)
-
-            # print(f'Закончил размножение |  target - ({target_row},{target_col})')
 
         self.energy //= 2
         
@@ -271,8 +263,6 @@ class Agent(Entity):
 
     def photosynthesis(self):
         self.energy += self.env_link.photosynthesis_energy
-
-        # print(f'Сделал фотосинтез |  coord - {self.coord}')
 
 
     def move_if_possible(self, direction: int):

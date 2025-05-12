@@ -27,16 +27,17 @@ class Programmatic_brain:
     # Геном это та вещь которая будет подвержина мутациям и будет передаваться по наследству
     # Мозг это та вещь которая помогает боту выбрать действие, это как обработчик генома
 
-    def __init__(self, genome = None, length_of_genome = 16):
+    def __init__(self, genome = None, length_of_genome = 64):
 
         self.counter = 0
-        self.length_of_genome = length_of_genome
 
+
+        self.length_of_genome = len(genome) if genome is not None else length_of_genome
         # genome это umpy array
         self.genome = genome if genome is not None else self.generate_random_genome()
 
     def generate_random_genome(self):
-        return np.array([np.random.randint(0, self.length_of_genome) for i in range(self.length_of_genome)])
+        return np.array([np.random.randint(0, self.length_of_genome-1) for i in range(self.length_of_genome)])
     
     def move_the_counter(self, shift):
         self.counter = (self.counter + shift) % self.length_of_genome
@@ -60,14 +61,14 @@ class Programmatic_brain:
 
             # Move and bite absolutely
             elif 1 <= command <= 8:        
-                action_function = partial(agent.bite_if_possible, direction=command)
+                action_function = partial(agent.move_and_bite_if_possible, direction=command)
                 self.move_the_counter(1)
                 break
 
             # Move and bite relatively
             elif command == 9:
                 next_command = self.genome[(self.counter + 1) % self.length_of_genome]
-                action_function = partial(agent.bite_if_possible, direction = (next_command % 8) + 1)
+                action_function = partial(agent.move_and_bite_if_possible, direction = (next_command % 8) + 1)
                 self.move_the_counter(2)
                 break
 
@@ -109,6 +110,10 @@ class Programmatic_brain:
 
         copy_of_genome = copy.deepcopy(self.genome)
 
+        # print(f'self.genome - {self.genome}')
+
+        # print(f'copy_of_genome - {copy_of_genome}')
+
 
 
         # Добавляем мутации
@@ -118,7 +123,7 @@ class Programmatic_brain:
 
             if np.random.choice([True,False], p=[0.5,0.5]):
 
-                copy_of_genome[i] = np.random.randint(0, self.length_of_genome)
+                copy_of_genome[i] = np.random.randint(0, self.length_of_genome-1)
 
         return copy_of_genome
 

@@ -224,7 +224,6 @@ class OpenEndedApp():
 
         self.NUM_OF_TILE_ROWS = env_parameters['NUM_OF_TILE_ROWS']
         self.NUM_OF_TILE_COLS = env_parameters['NUM_OF_TILE_COLS']
-        self.POPULATION_SIZE = env_parameters['POPULATION_SIZE']
         self.MAX_NUMBER_OF_FOODS = env_parameters['MAX_NUMBER_OF_FOODS']
 
 
@@ -233,10 +232,13 @@ class OpenEndedApp():
         self.env.generate_random_landscape()
 
 
-        # Первая популяция
+        # Жизнеспособный геном
         coord = (self.NUM_OF_TILE_ROWS//2, self.NUM_OF_TILE_COLS//2)
-        self.viable_genome = np.array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])
-        print(self.viable_genome)
+        self.viable_genome = np.array([10 for i in range(64)])
+
+        # 10% геном заменим на размножаться
+        self.viable_genome[np.random.choice(self.viable_genome.size, int(self.viable_genome.size * 0.1), replace=False)] = 0
+
         self.env.set_agent_at_location(coord, brain=Programmatic_brain(genome=self.viable_genome))
 
         self.env.generate_foods(self.MAX_NUMBER_OF_FOODS)
@@ -279,7 +281,7 @@ class OpenEndedApp():
             if fps_control_flag:
                 
                 # Сначала выполняем 1 шаг/итерацию среды 
-                current_agent_list = self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
+                agent_list_before_step = self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
 
                 if self.env.number_of_agents <= 0:
                     
@@ -290,18 +292,8 @@ class OpenEndedApp():
 
                 agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
-
-                # print(f'{self.env.number_of_agents == Agent.number_of_agents} - {self.env.number_of_agents} == { Agent.number_of_agents}')
-
-                # flag = self.env.number_of_agents == Agent.number_of_agents
-
-                # if flag == False:
-                #     print(f'Количество живых: {sum([int(agent.is_alive) for agent in agents_list])}')
-
-
-
                 self.stats['Avg of energy'] = int(np.average([agent.energy for agent in agents_list]))
-                # self.stats['# of Gen'] = generation_counter
+
 
 
 

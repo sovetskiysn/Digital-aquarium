@@ -205,7 +205,10 @@ class Environment():
 
 
         for agent in agents_list:
-            agent.set_action_function()            
+            agent.set_action_function()
+
+            if agent.is_alive == False: # проверка на смерть от думания
+                agent.die_or_harakiri()        
         
         # print(f'after set_action:')
         # print(f'# of alive = {sum([int(agent.is_alive) for agent in agents_list])}')
