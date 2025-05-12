@@ -43,51 +43,57 @@ class GeneticAlgorithmApp():
 
 
 
-        if visualization_flag:
-            stats ={'average_energy_number': env_parameters['START_AGENT_ENERGY'],
-                    'number_of_generations': 0}
+        if visualization_flag:            
+            self.stats = {'# of steps': 0,
+                          '# of live agents': Agent.number_of_agents,
+                          '# of foods': self.MAX_NUMBER_OF_FOODS,
+                          'Avg of energy': env_parameters['START_AGENT_ENERGY'],
+                          '# of Gen': 0}
             self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
-            self.vis.visualize_all(self.env, stats)
+            self.vis.visualize_all(self.env, self.stats)
 
 
     def calculate_stats(self, agent_list, generation_number):
         
-
         fitness_list = [self.fitness_function(agent) for agent in agent_list]
-        fitness_min = np.min(fitness_list)
-        fitness_max = np.max(fitness_list)
-        fitness_average = np.average(fitness_list)
-        fitness_median = np.median(fitness_list)
-
-
-        number_of_natural_death = sum([int(agent.natural_death) for agent in agent_list])
-        number_of_violent_death = sum([int(agent.be_eaten) for agent in agent_list])
-
-
         number_of_eaten_food_list = [agent.number_of_eaten_food for agent in agent_list]
-        number_of_eaten_food_min = np.min(number_of_eaten_food_list)
-        number_of_eaten_food_max = np.max(number_of_eaten_food_list)
-        number_of_eaten_food_average = np.average(number_of_eaten_food_list)
-        number_of_eaten_food_median = np.median(number_of_eaten_food_list)
-
-
+        number_of_eaten_other_agent_list = [agent.number_of_eaten_other_agent for agent in agent_list]
         age_list = [agent.age for agent in agent_list]
-        age_min = np.min(age_list)
-        age_max = np.max(age_list)
-        age_average = np.average(age_list)
-        age_median = np.median(age_list)
-
         energy_list = [agent.energy for agent in agent_list]
-        energy_min = np.min(energy_list)
-        energy_max = np.max(energy_list)
-        energy_average = np.average(energy_list)
-        energy_median = np.median(energy_list)
 
+        stacy = {
+            'generation_number': generation_number,
 
+            'fitness_min':np.min(fitness_list),
+            'fitness_max':np.max(fitness_list),
+            'fitness_average':np.average(fitness_list),
+            'fitness_median':np.median(fitness_list),
 
-        return [fitness_min, fitness_max, fitness_average, fitness_median, 
-                                number_of_natural_death, number_of_violent_death,
-                                number_of_eaten_food_min, number_of_eaten_food_max, number_of_eaten_food_average, number_of_eaten_food_median]
+            'number_of_natural_death':Agent.number_of_natural_deaths,
+            'number_of_violent_death':Agent.number_of_violent_deaths,
+
+            'eaten_food_min':np.min(number_of_eaten_food_list),
+            'eaten_food_max':np.max(number_of_eaten_food_list),
+            'eaten_food_average':np.average(number_of_eaten_food_list),
+            'eaten_food_median':np.median(number_of_eaten_food_list),
+
+            'eaten_other_agent_min':np.min(number_of_eaten_other_agent_list),
+            'eaten_other_agent_max':np.max(number_of_eaten_other_agent_list),
+            'eaten_other_agent_average':np.average(number_of_eaten_other_agent_list),
+            'eaten_other_agent_median':np.median(number_of_eaten_other_agent_list),
+
+            'age_min':np.min(age_list),
+            'age_max':np.max(age_list),
+            'age_average':np.average(age_list),
+            'age_median':np.median(age_list),
+
+            'energy_min':np.min(energy_list),
+            'energy_max':np.max(energy_list),
+            'energy_average':np.average(energy_list),
+            'energy_median':np.median(energy_list),
+            }
+        
+        return stacy
 
     def fitness_function(self, agent: Type[Agent]):
         return agent.age + agent.energy // 2
@@ -135,16 +141,11 @@ class GeneticAlgorithmApp():
 
 
         
-        df = pdd.DataFrame(columns=["Generation number", "Fitness-min", "Fitness-max", "Fitness-average", "Fitness-median", 
-                                    "Number of natural death", "Number of violent death", 
-                                    "Number of eaten food-min", "Number of eaten food-max", "Number of eaten food-average", "Number of eaten food-median"])
+        df = pdd.DataFrame()
         
 
         generation_counter = 0
         iteration_counter = 0
-
-        stats ={'average_energy_number': self.env.start_energy_of_agent,
-                'number_of_generations': 0}
 
         fps_control_flag = True
 
@@ -166,18 +167,22 @@ class GeneticAlgorithmApp():
             if fps_control_flag:
                 
                 # Сначала выполняем 1 шаг/итерацию среды 
-                current_agent_list = self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
+                agent_list_before_step = self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
 
-                if self.env.number_of_agents <= 0 or iteration_counter >= 10000:
+                if Agent.number_of_agents <= 0 or iteration_counter >= 10000:
 
                     
 
                     self.env.kill_all_agents()
 
                     statsy = self.calculate_stats(all_agents_list, generation_counter)
+                    df = pdd.concat([df, pdd.DataFrame([statsy])], ignore_index=True)
 
-                    df.loc[len(df)] = [generation_counter] + statsy
-                    print([generation_counter] + statsy)
+                    print('\n\n\n')
+                    print(f'----------generation({statsy['generation_number']}):')
+
+                    for key,value in statsy.items():
+                        print(f"{key}: {value}")
 
                     mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
 
@@ -194,15 +199,20 @@ class GeneticAlgorithmApp():
 
                 iteration_counter += 1
 
-                energy_list = [agent.energy for agent in current_agent_list]
+                agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
-                stats['average_energy_number'] = int(np.average(energy_list))
-                stats['number_of_generations'] = generation_counter
+                self.stats['Avg of energy'] = int(np.average([agent.energy for agent in agents_list]))
 
 
             if self.visualization_flag:
+
+                self.stats['# of steps'] = self.env.step_counter
+                self.stats['# of live agents'] = Agent.number_of_agents
+                self.stats['# of foods'] = Food.number_of_foods
+                self.stats['# of Gen'] = generation_counter
+
                 # рисуем парашу
-                self.vis.visualize_all(self.env, stats)
+                self.vis.visualize_all(self.env, self.stats)
                         
 
         df.to_excel("output.xlsx", index=False)

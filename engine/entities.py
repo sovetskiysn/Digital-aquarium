@@ -181,7 +181,7 @@ class Agent(Entity):
             print(f'right_boundary - {right_boundary}')
 
         # function
-        vectorized_func = np.vectorize(lambda entity: isinstance(entity, entity_type), otypes=[object])
+        vectorized_func = np.vectorize(lambda entity: isinstance(entity, entity_type))
         true_false_grid = vectorized_func(croped_world_grid)
         
         if return_type == 'instance_list':  

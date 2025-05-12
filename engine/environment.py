@@ -191,16 +191,16 @@ class Environment():
 
 
 
-        print('\n')
-        print(f'make_step({self.step_counter}):')
+        # print('\n')
+        # print(f'make_step({self.step_counter}):')
 
         agents_list = self.get_specific_entities(Agent, return_type='instance_list') 
 
 
-        print(f'len(agents_list) = {len(agents_list)}')
-        print(f'# of alive = {sum([int(agent.is_alive) for agent in agents_list])}')
-        print(f'self.number_of_agents = {self.number_of_agents}')
-        print(f'Agent.number_of_agents = {Agent.number_of_agents}')
+        # print(f'len(agents_list) = {len(agents_list)}')
+        # print(f'# of alive = {sum([int(agent.is_alive) for agent in agents_list])}')
+        # print(f'self.number_of_agents = {self.number_of_agents}')
+        # print(f'Agent.number_of_agents = {Agent.number_of_agents}')
 
 
 
@@ -238,26 +238,26 @@ class Environment():
 
             
 
-            if hasattr(agent.action_function, '__name__'):
-                stringgg[i] = agent.action_function.__name__
-            else:
-                p = agent.action_function
-                func_name = p.func.__name__
+        #     if hasattr(agent.action_function, '__name__'):
+        #         stringgg[i] = agent.action_function.__name__
+        #     else:
+        #         p = agent.action_function
+        #         func_name = p.func.__name__
 
-                    # Получить зафиксированные позиционные и ключевые аргументы
-                fixed_args = p.args         # кортеж позиционных аргументов
-                fixed_kwargs = p.keywords   # словарь ключевых аргументов
+        #             # Получить зафиксированные позиционные и ключевые аргументы
+        #         fixed_args = p.args         # кортеж позиционных аргументов
+        #         fixed_kwargs = p.keywords   # словарь ключевых аргументов
 
-                # Собрать строку
-                params_str = ", ".join(
-                    [repr(arg) for arg in fixed_args] +
-                    [f"{k}={v!r}" for k, v in fixed_kwargs.items()]
-                )
+        #         # Собрать строку
+        #         params_str = ", ".join(
+        #             [repr(arg) for arg in fixed_args] +
+        #             [f"{k}={v!r}" for k, v in fixed_kwargs.items()]
+        #         )
 
-                stringgg[i] = f"{func_name}({params_str})"
+        #         stringgg[i] = f"{func_name}({params_str})"
 
 
-        print(stringgg)
+        # print(stringgg)
             
         # print(f'after action_function:')
         # print(f'# of alive = {sum([int(agent.is_alive) for agent in agents_list])}')
@@ -276,13 +276,13 @@ class Environment():
         self.number_of_agents = np.count_nonzero(self.get_specific_entities(Agent, return_type='true_false_grid'))
         
 
-        print('------')
-        print(f'after check_is_alive:')
-        new_agents_list = self.get_specific_entities(Agent, return_type='instance_list')
-        print(f'# of alive = {sum([int(agent.is_alive) for agent in new_agents_list])}')
-        print(f'self.number_of_agents = {self.number_of_agents}')
-        print(f'Agent.number_of_agents = {Agent.number_of_agents}')
-        print(f'natural/death = {Agent.number_of_natural_deaths}/{Agent.number_of_violent_deaths}')
+        # print('------')
+        # print(f'after check_is_alive:')
+        # new_agents_list = self.get_specific_entities(Agent, return_type='instance_list')
+        # print(f'# of alive = {sum([int(agent.is_alive) for agent in new_agents_list])}')
+        # print(f'self.number_of_agents = {self.number_of_agents}')
+        # print(f'Agent.number_of_agents = {Agent.number_of_agents}')
+        # print(f'natural/death = {Agent.number_of_natural_deaths}/{Agent.number_of_violent_deaths}')
 
         
 
