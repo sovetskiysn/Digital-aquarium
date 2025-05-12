@@ -101,14 +101,47 @@ class GeneticAlgorithmApp():
 
     def fitness_proportionate_selection(self, agent_list):
         
-
         fitness_list = [self.fitness_function(agent) for agent in agent_list]
 
         return agent_list, [i/sum(fitness_list) for i in fitness_list]
     
+
+    def rank_selection(self, agent_list):
+        # Оцениваем фитнес каждого агента
+        fitness_list = [self.fitness_function(agent) for agent in agent_list]
+
+        # Сортируем агентов по возрастанию фитнеса (от наихудшего к лучшему)
+        sorted_agents_with_fitness = sorted(zip(agent_list, fitness_list), key=lambda x: x[1])
+
+        # Присваиваем ранги: 1, 2, ..., N
+        ranks = list(range(1, len(agent_list) + 1))
+
+        # Вычисляем сумму рангов
+        rank_sum = sum(ranks)
+
+        # Присваиваем вероятности на основе рангов
+        probabilities = [rank / rank_sum for rank in ranks]
+
+        # Возвращаем агентов в ранжированном порядке и соответствующие вероятности
+        sorted_agents = [agent for agent, _ in sorted_agents_with_fitness]
+        return sorted_agents, probabilities
+    
+
+    def elitism_selection(self, agent_list, elite_count=10):
+        fitness_list = [self.fitness_function(agent) for agent in agent_list]
+        
+        sorted_agents = [agent for agent, _ in sorted(
+            zip(agent_list, fitness_list),
+            key=lambda x: x[1],
+            reverse=True
+        )]
+
+        elite_agents = sorted_agents[:elite_count]
+        probabilities = [1.0 / elite_count] * elite_count
+
+        return elite_agents, probabilities
+    
     def uniform_crossover(self, agent_list, probabilities, new_gen_size):
-
-
         brains = []
         for i in range(new_gen_size):
             # SELECTION
@@ -118,22 +151,46 @@ class GeneticAlgorithmApp():
             parent1 = agent_list[parent1_index]
             parent2 = agent_list[parent2_index]
 
-
             # CROSSOVER
             offspring_genome = {}
             for key in parent1.genome:
-
                 # Однородное скрещивание: случайный выбор веса от одного из родителей
                 mask = torch.randint(0, 2, parent1.genome[key].shape, dtype=torch.bool)
+                # Ставим значение из одного из родителей в зависимости от маски
                 offspring_genome[key] = torch.where(mask, parent1.genome[key], parent2.genome[key])
 
-            
-            offspring_brain = parent1.brain.__class__(genome = offspring_genome)
+            # Создаем потомка
+            offspring_brain = parent1.brain.__class__(genome=offspring_genome)
 
+            # Добавляем потомка в список
             brains.append(offspring_brain)
 
         return brains
 
+
+    def arithmetic_crossover(self, agent_list, probabilities, new_gen_size):
+        brains = []
+        for i in range(new_gen_size):
+            # SELECTION
+            parent1_index = np.random.choice(len(agent_list), p=probabilities)
+            parent2_index = np.random.choice(len(agent_list), p=probabilities)
+
+            parent1 = agent_list[parent1_index]
+            parent2 = agent_list[parent2_index]
+
+            # CROSSOVER
+            offspring_genome = {}
+            for key in parent1.genome:
+                # Среднее арифметическое между весами двух родителей
+                offspring_genome[key] = (parent1.genome[key] + parent2.genome[key]) / 2
+
+            # Создаем потомка
+            offspring_brain = parent1.brain.__class__(genome=offspring_genome)
+
+            # Добавляем потомка в список
+            brains.append(offspring_brain)
+
+        return brains
 
     
     def run(self):
@@ -186,10 +243,17 @@ class GeneticAlgorithmApp():
 
 
                         
-
+                    # SELECTION
                     mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
+                    # mating_pool, probabilities = self.rank_selection(all_agents_list)
 
+
+                    # CROSSOVER
                     new_agents_brains = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+
+
+                    # MUTATIONS IN AGENT'S BRAIN
+
 
                     self.env.distribute_agents_on_map(new_agents_brains)
 

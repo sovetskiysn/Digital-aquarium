@@ -48,9 +48,14 @@ first = copy.deepcopy(Ansar.genome)
 second = mutate_state_dict(first, percent=90)
 
 
-print(str(first) == str(second))
-print('\n\n-----------\n\n')
-print(str(first))
+# print(str(first) == str(second))
+# print('\n\n-----------\n\n')
+# print(str(first))
 
-print('\n\n-----------\n\n')
-print(str(second))
+# print('\n\n-----------\n\n')
+# print(str(second))
+
+elite_count = 5
+probabilities = [1.0 / elite_count] * elite_count
+
+print(probabilities)
