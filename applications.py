@@ -180,9 +180,12 @@ class GeneticAlgorithmApp():
 
                     print('\n\n\n')
                     print(f'----------generation({statsy['generation_number']}):')
-
                     for key,value in statsy.items():
                         print(f"{key}: {value}")
+
+
+
+                        
 
                     mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
 

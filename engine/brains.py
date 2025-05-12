@@ -228,7 +228,7 @@ class Classic_NN_brain(nn.Module):
 
         return action_function
 
-    def get_copy_of_genome(self):
+    def get_copy_of_genome(self, percent=10):
         copy_of_genome = copy.deepcopy(self.genome)
 
 
@@ -242,9 +242,8 @@ class Classic_NN_brain(nn.Module):
         bound = get_kaiming_bound(self.HidenLayer1.weight)
 
 
-        percentage = 0.001
         for key in copy_of_genome:
-            mask = torch.rand_like(copy_of_genome[key]) < percentage * 0.01  # 0.2 = 20% probability
+            mask = torch.rand_like(copy_of_genome[key]) < (percent / 100)  # percent is value in 0% - 100%
             copy_of_genome[key][mask] = torch.empty(mask.sum()).uniform_(-bound, bound)  # Assign new random values 
         
         

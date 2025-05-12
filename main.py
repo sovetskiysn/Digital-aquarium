@@ -13,7 +13,7 @@ env_parameters = {'NUM_OF_TILE_ROWS': 30,
                   'MAX_AGENT_AGE':float('inf')}
 
 
-ga_parameters = {'NUMBER_OF_GENERATIONS':500,
+ga_parameters = {'NUMBER_OF_GENERATIONS':10,
                 'MAX_ITERATION_NUMBER':10_000}
 
 
