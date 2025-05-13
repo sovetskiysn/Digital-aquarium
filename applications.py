@@ -168,11 +168,11 @@ class GeneticAlgorithmApp():
         return brains
 
 
-    def arithmetic_crossover(self, agent_list, probabilities, new_gen_size):
+    def arithmetic_crossover(self, agent_list, probabilities, new_gen_size, noise_std=0.01):
         brains = []
         for i in range(new_gen_size):
             # SELECTION
-            parent1_index = np.random.choice(len(agent_list), p=probabilities)
+            parent1_index = np.random.choice(len(agent_list), p=probabilities) # Особенность - такая реализация позволяет выбрать одного и того же агента как два раза, что по сути клон
             parent2_index = np.random.choice(len(agent_list), p=probabilities)
 
             parent1 = agent_list[parent1_index]
@@ -182,7 +182,43 @@ class GeneticAlgorithmApp():
             offspring_genome = {}
             for key in parent1.genome:
                 # Среднее арифметическое между весами двух родителей
-                offspring_genome[key] = (parent1.genome[key] + parent2.genome[key]) / 2
+                mean = (parent1.genome[key] + parent2.genome[key]) / 2
+                noise = torch.randn_like(mean) * noise_std  # Нормальный шум
+                offspring_genome[key] = mean + noise
+
+            # Создаем потомка
+            offspring_brain = parent1.brain.__class__(genome=offspring_genome)
+
+            # Добавляем потомка в список
+            brains.append(offspring_brain)
+
+        return brains
+    
+
+    def blend_crossover(self, agent_list, probabilities, new_gen_size, alpha=0.1):
+        brains = []
+        for i in range(new_gen_size):
+            # SELECTION
+            parent1_index = np.random.choice(len(agent_list), p=probabilities, replace=False)  # Без повторений
+            parent2_index = np.random.choice(len(agent_list), p=probabilities, replace=False)  # Без повторений
+
+            parent1 = agent_list[parent1_index]
+            parent2 = agent_list[parent2_index]
+
+            # CROSSOVER
+            offspring_genome = {}
+            for key in parent1.genome:
+                # Вычисляем разницу d
+                d = torch.abs(parent1.genome[key] - parent2.genome[key])
+
+                # Определяем интервал для потомка
+                lower_bound = torch.min(parent1.genome[key], parent2.genome[key]) - alpha * d
+                upper_bound = torch.max(parent1.genome[key], parent2.genome[key]) + alpha * d
+
+                offspring_value = lower_bound + (upper_bound - lower_bound) * torch.rand_like(parent1.genome[key])
+
+                # Итоговое значение потомка для данного гена
+                offspring_genome[key] = offspring_value
 
             # Создаем потомка
             offspring_brain = parent1.brain.__class__(genome=offspring_genome)
@@ -246,15 +282,18 @@ class GeneticAlgorithmApp():
                     # SELECTION
                     mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
                     # mating_pool, probabilities = self.rank_selection(all_agents_list)
+                    # mating_pool, probabilities = self.elitism_selection(all_agents_list)
 
 
                     # CROSSOVER
                     new_agents_brains = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    # new_agents_brains = self.arithmetic_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    # new_agents_brains = self.blend_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
 
 
                     # MUTATIONS IN AGENT'S BRAIN
 
-
+                    # REPLACEMENT
                     self.env.distribute_agents_on_map(new_agents_brains)
 
 
