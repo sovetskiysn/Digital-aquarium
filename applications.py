@@ -52,6 +52,9 @@ class GeneticAlgorithmApp():
             self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
             self.vis.visualize_all(self.env, self.stats)
 
+        # if excel_flag:
+        #     dict_df = pdd.DataFrame(list(my_dict.items()), columns=["Параметр", "Значение"])
+
 
     def calculate_stats(self, agent_list, generation_number):
         
@@ -142,7 +145,7 @@ class GeneticAlgorithmApp():
         return elite_agents, probabilities
     
     def uniform_crossover(self, agent_list, probabilities, new_gen_size):
-        brains = []
+        offspring_genomes = []
         for i in range(new_gen_size):
             # SELECTION
             parent1_index = np.random.choice(len(agent_list), p=probabilities)
@@ -152,24 +155,21 @@ class GeneticAlgorithmApp():
             parent2 = agent_list[parent2_index]
 
             # CROSSOVER
-            offspring_genome = {}
+            new_genome = {}
             for key in parent1.genome:
                 # Однородное скрещивание: случайный выбор веса от одного из родителей
                 mask = torch.randint(0, 2, parent1.genome[key].shape, dtype=torch.bool)
                 # Ставим значение из одного из родителей в зависимости от маски
-                offspring_genome[key] = torch.where(mask, parent1.genome[key], parent2.genome[key])
-
-            # Создаем потомка
-            offspring_brain = parent1.brain.__class__(genome=offspring_genome)
+                new_genome[key] = torch.where(mask, parent1.genome[key], parent2.genome[key])
 
             # Добавляем потомка в список
-            brains.append(offspring_brain)
+            offspring_genomes.append(new_genome)
 
-        return brains
+        return offspring_genomes
 
 
     def arithmetic_crossover(self, agent_list, probabilities, new_gen_size, noise_std=0.01):
-        brains = []
+        offspring_genomes = []
         for i in range(new_gen_size):
             # SELECTION
             parent1_index = np.random.choice(len(agent_list), p=probabilities) # Особенность - такая реализация позволяет выбрать одного и того же агента как два раза, что по сути клон
@@ -179,24 +179,21 @@ class GeneticAlgorithmApp():
             parent2 = agent_list[parent2_index]
 
             # CROSSOVER
-            offspring_genome = {}
+            new_genome = {}
             for key in parent1.genome:
                 # Среднее арифметическое между весами двух родителей
                 mean = (parent1.genome[key] + parent2.genome[key]) / 2
                 noise = torch.randn_like(mean) * noise_std  # Нормальный шум
-                offspring_genome[key] = mean + noise
-
-            # Создаем потомка
-            offspring_brain = parent1.brain.__class__(genome=offspring_genome)
+                new_genome[key] = mean + noise
 
             # Добавляем потомка в список
-            brains.append(offspring_brain)
+            offspring_genomes.append(new_genome)
 
-        return brains
+        return offspring_genomes
     
 
     def blend_crossover(self, agent_list, probabilities, new_gen_size, alpha=0.1):
-        brains = []
+        offspring_genomes = []
         for i in range(new_gen_size):
             # SELECTION
             parent1_index = np.random.choice(len(agent_list), p=probabilities, replace=False)  # Без повторений
@@ -206,7 +203,7 @@ class GeneticAlgorithmApp():
             parent2 = agent_list[parent2_index]
 
             # CROSSOVER
-            offspring_genome = {}
+            new_genome = {}
             for key in parent1.genome:
                 # Вычисляем разницу d
                 d = torch.abs(parent1.genome[key] - parent2.genome[key])
@@ -218,15 +215,12 @@ class GeneticAlgorithmApp():
                 offspring_value = lower_bound + (upper_bound - lower_bound) * torch.rand_like(parent1.genome[key])
 
                 # Итоговое значение потомка для данного гена
-                offspring_genome[key] = offspring_value
-
-            # Создаем потомка
-            offspring_brain = parent1.brain.__class__(genome=offspring_genome)
+                new_genome[key] = offspring_value
 
             # Добавляем потомка в список
-            brains.append(offspring_brain)
+            offspring_genomes.append(new_genome)
 
-        return brains
+        return offspring_genomes
 
     
     def run(self):
@@ -278,6 +272,7 @@ class GeneticAlgorithmApp():
 
 
 
+
                         
                     # SELECTION
                     mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
@@ -286,14 +281,18 @@ class GeneticAlgorithmApp():
 
 
                     # CROSSOVER
-                    new_agents_brains = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
-                    # new_agents_brains = self.arithmetic_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
-                    # new_agents_brains = self.blend_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    offspring_genomes = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    # offspring_genomes = self.arithmetic_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    # offspring_genomes = self.blend_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
 
 
                     # MUTATIONS IN AGENT'S BRAIN
+                    brain_class = all_agents_list[0].brain.__class__
+                    offspring_genomes = [brain_class.mutate_genome(genome, percent=10) for genome in offspring_genomes]
 
+                    
                     # REPLACEMENT
+                    new_agents_brains = [brain_class(genome=genome) for genome in offspring_genomes]
                     self.env.distribute_agents_on_map(new_agents_brains)
 
 
@@ -322,6 +321,11 @@ class GeneticAlgorithmApp():
                         
 
         df.to_excel("output.xlsx", index=False)
+
+
+        with pdd.ExcelWriter("output.xlsx") as writer:
+            df.to_excel(writer, sheet_name="Статистика", index=False)
+            # dict_df.to_excel(writer, sheet_name="Статистика", index=False)
 
 
 

@@ -3,7 +3,6 @@
 Этот проект представляет собой Reinforcement learning model, с децентрализованно мультиагентной, дискретной средой и агентами в виде простой нейросети.
 Для обучения этой нейросети используется классический генетический алгоритм.
 
-
 III место на 2025 IEEE AITU: Digital Generation
 Sovet Sanzhar, Nurakhov Edil, Aitolkyn Kulmuratova, Evolution of agents in a virtual environment using neural networks and genetic algorithm
 
@@ -17,9 +16,7 @@ Sovet Sanzhar, Nurakhov Edil, Aitolkyn Kulmuratova, Evolution of agents in a vir
 
 Python 3.12.5
 
-
-
 Моменты над которыми надо подумать:
-+ баг с (-2, ??) координатами
-+ обновление статистики
-+ можно попробывать уменьшить количество кода в bite если got_bitten будет сначала заменять себя на under_reference, а затем делать просто move
+
+- баг с (-2, ??) координатами
+- можно попробывать уменьшить количество кода в bite если got_bitten будет сначала заменять себя на under_reference, а затем делать просто move
