@@ -39,7 +39,7 @@ class GeneticAlgorithmApp():
 
 
         # Первая популяция
-        self.env.generate_random_agents(brain_class=Forward_NN_brain, number_of_agents=self.POPULATION_SIZE)
+        self.env.generate_random_agents(brain_class=Micro_NN_brain, number_of_agents=self.POPULATION_SIZE)
         self.env.generate_foods(self.MAX_NUMBER_OF_FOODS)
 
 
@@ -67,7 +67,7 @@ class GeneticAlgorithmApp():
             self.setting_df = pdd.concat([empty_row, header1, env_df, empty_row, header2, ga_df], ignore_index=True)
 
 
-    def calculate_stats(self, agent_list, generation_number):
+    def calculate_stats(self, agent_list, generation_number, iteration_counter):
         
         fitness_list = [self.fitness_function(agent) for agent in agent_list]
         number_of_eaten_food_list = [agent.number_of_eaten_food for agent in agent_list]
@@ -77,6 +77,7 @@ class GeneticAlgorithmApp():
 
         stacy = {
             'generation_number': generation_number,
+            'iteration_counter': iteration_counter,
 
             'fitness_min':np.min(fitness_list),
             'fitness_max':np.max(fitness_list),
@@ -111,6 +112,7 @@ class GeneticAlgorithmApp():
 
     def fitness_function(self, agent: Type[Agent]):
         return agent.age + agent.energy // 2
+        # return agent.age
     
 
     def fitness_proportionate_selection(self, agent_list):
@@ -155,6 +157,27 @@ class GeneticAlgorithmApp():
 
         return elite_agents, probabilities
     
+
+    def fitness_proportionate_elitism_selection(self, agent_list, elite_count=10):
+        # Вычисляем фитнес для всех агентов
+        fitness_list = [self.fitness_function(agent) for agent in agent_list]
+
+        # Сортируем агентов по фитнесу по убыванию
+        sorted_agents = [agent for agent, _ in sorted(
+            zip(agent_list, fitness_list),
+            key=lambda x: x[1],
+            reverse=True
+        )]
+
+        # Выбираем элиту
+        elite_agents = sorted_agents[:elite_count]
+
+        # Вычисляем фитнесы только для элитных агентов
+        elite_fitnesses = [self.fitness_function(agent) for agent in elite_agents]
+
+        return elite_agents, [i/sum(elite_fitnesses) for i in elite_fitnesses]
+    
+
     def uniform_crossover(self, agent_list, probabilities, new_gen_size):
         offspring_genomes = []
         for i in range(new_gen_size):
@@ -179,7 +202,7 @@ class GeneticAlgorithmApp():
         return offspring_genomes
 
 
-    def arithmetic_crossover(self, agent_list, probabilities, new_gen_size, noise_std=0.01):
+    def arithmetic_crossover(self, agent_list, probabilities, new_gen_size, noise_std=0.001):
         offspring_genomes = []
         for i in range(new_gen_size):
             # SELECTION
@@ -199,6 +222,17 @@ class GeneticAlgorithmApp():
 
             # Добавляем потомка в список
             offspring_genomes.append(new_genome)
+
+        return offspring_genomes
+    
+    def clone_crossover(self, agent_list, probabilities, new_gen_size):
+        offspring_genomes = []
+        for _ in range(new_gen_size):
+            # Выбираем одного родителя по вероятности
+            parent_index = np.random.choice(len(agent_list), p=probabilities)
+            parent = agent_list[parent_index]
+
+            offspring_genomes.append(parent.genome)
 
         return offspring_genomes
 
@@ -245,6 +279,7 @@ class GeneticAlgorithmApp():
 
         generation_counter = 0
         iteration_counter = 0
+        step_counter = 0
 
         fps_control_flag = True
 
@@ -274,7 +309,7 @@ class GeneticAlgorithmApp():
 
                     self.env.kill_all_agents()
 
-                    statsy = self.calculate_stats(all_agents_list, generation_counter)
+                    statsy = self.calculate_stats(all_agents_list, generation_counter, iteration_counter)
                     df = pdd.concat([df, pdd.DataFrame([statsy])], ignore_index=True)
 
                     print('\n\n\n')
@@ -287,15 +322,17 @@ class GeneticAlgorithmApp():
 
                         
                     # SELECTION
-                    mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
+                    # mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
                     # mating_pool, probabilities = self.rank_selection(all_agents_list)
                     # mating_pool, probabilities = self.elitism_selection(all_agents_list)
+                    mating_pool, probabilities = self.fitness_proportionate_elitism_selection(all_agents_list, elite_count=5)
 
 
                     # CROSSOVER
-                    offspring_genomes = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    # offspring_genomes = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
                     # offspring_genomes = self.arithmetic_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
                     # offspring_genomes = self.blend_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    offspring_genomes = self.clone_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
 
 
                     # MUTATIONS IN AGENT'S GENOME
@@ -315,15 +352,17 @@ class GeneticAlgorithmApp():
                     generation_counter += 1
 
                 iteration_counter += 1
+                step_counter += 1
 
                 agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
-                self.stats['Avg of energy'] = int(np.average([agent.energy for agent in agents_list]))
+                if self.visualization_flag:
+                    self.stats['Avg of energy'] = int(np.average([agent.energy for agent in agents_list]))
 
 
             if self.visualization_flag:
 
-                self.stats['# of steps'] = self.env.step_counter
+                self.stats['# of steps'] = step_counter
                 self.stats['# of live agents'] = Agent.number_of_agents
                 self.stats['# of foods'] = Food.number_of_foods
                 self.stats['# of Gen'] = generation_counter

@@ -12,9 +12,6 @@ class Environment():
         
         self.world_grid = np.zeros(shape, dtype=object)
 
-        # статистики
-        self.step_counter = 0
-
         # Параметры среды
         self.max_number_of_foods = parameters['MAX_NUMBER_OF_FOODS']
         self.number_of_new_foods = parameters['NUMBER_OF_NEW_FOODS']
@@ -190,7 +187,7 @@ class Environment():
 
         # permutation нужен чтобы действия агентов выполнялись в случайном порядке 
         # случайный порядок нужен чтобы у тех кто левее не было преимущество
-        for i, agent in enumerate(np.random.permutation(agents_list)):
+        for agent in np.random.permutation(agents_list):
             
             # Нужно проверить ли живой агент, отсеет всех
             # 1) кого убил другой агент, другой агент убил текущего агента до того как он смог что-то сделать
@@ -206,12 +203,6 @@ class Environment():
 
                 if agent.check_is_alive() == False: # проверка на естественную смерть
                     agent.die_or_harakiri()
-
-            
-
-        
-        # обновляем статистику
-        self.step_counter += 1
 
         return agents_list
 
