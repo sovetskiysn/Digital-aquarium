@@ -364,7 +364,7 @@ class OpenEndedApp():
 
         # Жизнеспособный геном
         coord = (self.NUM_OF_TILE_ROWS//2, self.NUM_OF_TILE_COLS//2)
-        self.viable_genome = np.array([10 for i in range(64)])
+        self.viable_genome = np.array([10 for i in range(16)])
 
         # 10% геном заменим на размножаться
         self.viable_genome[np.random.choice(self.viable_genome.size, int(self.viable_genome.size * 0.1), replace=False)] = 0
@@ -423,6 +423,10 @@ class OpenEndedApp():
                 agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
                 self.stats['Avg of energy'] = int(np.average([agent.energy for agent in agents_list]))
+
+
+                print(f'len(agents_list) - {len(agents_list)}')
+                print(f'agents_list[0].genome - {agents_list[0].genome}')
 
 
 

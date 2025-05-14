@@ -190,7 +190,6 @@ class Environment():
 
         # permutation нужен чтобы действия агентов выполнялись в случайном порядке 
         # случайный порядок нужен чтобы у тех кто левее не было преимущество
-        stringgg = {}
         for i, agent in enumerate(np.random.permutation(agents_list)):
             
             # Нужно проверить ли живой агент, отсеет всех

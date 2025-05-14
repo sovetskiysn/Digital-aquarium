@@ -109,23 +109,40 @@
 # print('\n------------\n')
 # print('third.genome:')
 # print(str(third.genome))
-
+import copy
+import numpy as np
 
 class MyClass:
     def my_method(self):
         print("Hello")
 
-    def new():
-        print('aaaaaa')
+    def mutate_genome(genome, percent=100):
+
+        mutated = genome
+
+        length_of_genome = len(genome)
+        indexes = [i for i in range(length_of_genome)]
+        max_number_of_mutation = round( length_of_genome * percent / 100)
+
+        mutation_indexes = np.random.choice(indexes, size=max_number_of_mutation, replace=False)
+
+        for i in mutation_indexes:
+            mutated[i] = np.random.randint(0, length_of_genome-1)
+
+        return mutated
 
 
 
-a = MyClass()
 
 
+viable_genome = np.array([10 for i in range(16)])
 
-agent_class = a.__class__
+# 10% геном заменим на размножаться
+viable_genome[np.random.choice(viable_genome.size, int(viable_genome.size * 0.1), replace=False)] = 0
 
 
-agent_class.new()
+print(viable_genome)
 
+new_genome = MyClass.mutate_genome(genome=viable_genome)
+
+print(new_genome)

@@ -115,7 +115,7 @@ class Programmatic_brain:
 
         length_of_genome = len(genome)
         indexes = [i for i in range(length_of_genome)]
-        max_number_of_mutation = int(percent / length_of_genome)
+        max_number_of_mutation = round( length_of_genome * percent / 100)
 
         mutation_indexes = np.random.choice(indexes, size=max_number_of_mutation, replace=False)
 
@@ -219,7 +219,6 @@ class Forward_NN_brain(nn.Module):
 
         if 0 <= action <= 7: # move and bite
             action_function = partial(agent.move_and_bite_if_possible, direction=action + 1)
-
         else:
             print('ERROR')
 

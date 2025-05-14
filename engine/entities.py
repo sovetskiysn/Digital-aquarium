@@ -222,7 +222,10 @@ class Agent(Entity):
             target_col = available_locations_list[random_index][0][1]
 
             # Создаем новый мозг для этого агента с возможными мутациями
-            descendent_brain = self.brain.__class__(genome = self.brain.get_copy_of_genome())
+
+            offspring_genome = self.brain.get_copy_of_genome()
+            mutated_offspring_genome = self.brain.__class__.mutate_genome(offspring_genome, percent=10)
+            descendent_brain = self.brain.__class__(genome = mutated_offspring_genome)
 
             self.env_link.set_agent_at_location((target_row, target_col), brain=descendent_brain)
 
