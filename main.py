@@ -13,12 +13,15 @@ env_parameters = {'NUM_OF_TILE_ROWS': 30,
                   'MAX_AGENT_AGE':float('inf')}
 
 
-ga_parameters = {'NUMBER_OF_GENERATIONS':10,
-                'MAX_ITERATION_NUMBER':10_000}
+ga_parameters = {
+                'NUMBER_OF_GENERATIONS':10,
+                'MAX_ITERATION_NUMBER':10_000,
+                'MUTATION_PERCENTAGE':5
+                }
 
 
 
-app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=True)
+app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=True, excel_flag=True)
 app.run()
 
 

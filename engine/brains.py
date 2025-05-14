@@ -130,11 +130,11 @@ class Programmatic_brain:
 
 
 
-class Classic_NN_brain(nn.Module):
+class Forward_NN_brain(nn.Module):
 
     def __init__(self, genome = None):
 
-        super(Classic_NN_brain, self).__init__()
+        super(Forward_NN_brain, self).__init__()
 
         
         # Входные параметры это 2 блока вокруг агента плюс Количество энергий, Текущий возраст

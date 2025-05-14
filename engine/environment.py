@@ -14,8 +14,6 @@ class Environment():
 
         # статистики
         self.step_counter = 0
-        self.number_of_agents = 0
-        self.number_of_foods = 0
 
         # Параметры среды
         self.max_number_of_foods = parameters['MAX_NUMBER_OF_FOODS']
@@ -58,7 +56,7 @@ class Environment():
 
         coord_list = self.get_specific_entities((Grass, Dirt), return_type='coord_list')
 
-        diff = self.max_number_of_foods - self.number_of_foods
+        diff = self.max_number_of_foods - Food.number_of_foods
 
         number_of_foods = diff if diff<number_of_foods else number_of_foods
         
@@ -69,7 +67,6 @@ class Environment():
             for row, col in coord_list[indexes]:
                 self.world_grid[row,col] = Food((row,col), env=self)
 
-            self.number_of_foods += number_of_foods
 
 
     def generate_random_agents(self, brain_class, number_of_agents = 5):
@@ -83,7 +80,6 @@ class Environment():
                 self.world_grid[row,col] = Agent((row,col), brain=brain_class(), env=self)
 
 
-            self.number_of_agents += number_of_agents
 
 
     def kill_all_agents(self):
@@ -150,9 +146,6 @@ class Environment():
                 self.world_grid[row,col] = Agent((row, col), brain=offspring_brain, env=self)
 
 
-            # тут написанно так потому что может быть предыдущее поколение жить а может быть автоматом убито
-            self.number_of_agents = np.count_nonzero(self.get_specific_entities(Agent, return_type='true_false_grid'))
-
 
     def set_agent_at_location(self, coord: tuple, brain):
 
@@ -162,16 +155,9 @@ class Environment():
 
             self.world_grid[row,col] = Agent((row,col), brain=brain, env=self)
 
-            self.number_of_agents += 1
 
 
 
-    def clean_statistics(self):
-
-        self.step_counter = 0
-        self.number_of_agents = 0
-        self.number_of_foods = 0
-        self.average_energy_number = self.start_energy_of_agent
 
 
     def make_step(self):
@@ -186,21 +172,12 @@ class Environment():
             food.update(self)
 
 
-        if self.number_of_foods < self.max_number_of_foods:
+        if Food.number_of_foods < self.max_number_of_foods:
             self.generate_foods(self.number_of_new_foods)
 
 
-
-        # print('\n')
-        # print(f'make_step({self.step_counter}):')
-
         agents_list = self.get_specific_entities(Agent, return_type='instance_list') 
 
-
-        # print(f'len(agents_list) = {len(agents_list)}')
-        # print(f'# of alive = {sum([int(agent.is_alive) for agent in agents_list])}')
-        # print(f'self.number_of_agents = {self.number_of_agents}')
-        # print(f'Agent.number_of_agents = {Agent.number_of_agents}')
 
 
 
@@ -210,11 +187,6 @@ class Environment():
             if agent.is_alive == False: # проверка на смерть от думания
                 agent.die_or_harakiri()        
         
-        # print(f'after set_action:')
-        # print(f'# of alive = {sum([int(agent.is_alive) for agent in agents_list])}')
-        # print(f'self.number_of_agents = {self.number_of_agents}')
-        # print(f'Agent.number_of_agents = {Agent.number_of_agents}')
-
 
         # permutation нужен чтобы действия агентов выполнялись в случайном порядке 
         # случайный порядок нужен чтобы у тех кто левее не было преимущество
@@ -238,58 +210,9 @@ class Environment():
 
             
 
-        #     if hasattr(agent.action_function, '__name__'):
-        #         stringgg[i] = agent.action_function.__name__
-        #     else:
-        #         p = agent.action_function
-        #         func_name = p.func.__name__
-
-        #             # Получить зафиксированные позиционные и ключевые аргументы
-        #         fixed_args = p.args         # кортеж позиционных аргументов
-        #         fixed_kwargs = p.keywords   # словарь ключевых аргументов
-
-        #         # Собрать строку
-        #         params_str = ", ".join(
-        #             [repr(arg) for arg in fixed_args] +
-        #             [f"{k}={v!r}" for k, v in fixed_kwargs.items()]
-        #         )
-
-        #         stringgg[i] = f"{func_name}({params_str})"
-
-
-        # print(stringgg)
-            
-        # print(f'after action_function:')
-        # print(f'# of alive = {sum([int(agent.is_alive) for agent in agents_list])}')
-        # print(f'self.number_of_agents = {self.number_of_agents}')
-        # print(f'Agent.number_of_agents = {Agent.number_of_agents}')        
-
-        # for agent in agents_list:
-        #     if agent.check_is_alive() == False: # случай естественной смерти
-        #         agent.die_or_harakiri()
-            
-                
-
         
         # обновляем статистику
         self.step_counter += 1
-        self.number_of_agents = np.count_nonzero(self.get_specific_entities(Agent, return_type='true_false_grid'))
-        
-
-        # print('------')
-        # print(f'after check_is_alive:')
-        # new_agents_list = self.get_specific_entities(Agent, return_type='instance_list')
-        # print(f'# of alive = {sum([int(agent.is_alive) for agent in new_agents_list])}')
-        # print(f'self.number_of_agents = {self.number_of_agents}')
-        # print(f'Agent.number_of_agents = {Agent.number_of_agents}')
-        # print(f'natural/death = {Agent.number_of_natural_deaths}/{Agent.number_of_violent_deaths}')
-
-        
-
-        self.number_of_foods = np.count_nonzero(self.get_specific_entities(Food, return_type='true_false_grid'))
-
-        self.average_energy_number = sum([i.energy for i in agents_list]) // self.number_of_agents if self.number_of_agents != 0 else 0
-
 
         return agents_list
 

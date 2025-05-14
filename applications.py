@@ -31,6 +31,7 @@ class GeneticAlgorithmApp():
         # GA parameters
         self.number_of_generations = ga_parameters['NUMBER_OF_GENERATIONS']
         self.max_iteration_number = ga_parameters['MAX_ITERATION_NUMBER']
+        self.mutation_percentage = ga_parameters['MUTATION_PERCENTAGE']
 
         self.env = Environment(shape=(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS), parameters=env_parameters)
 
@@ -38,7 +39,7 @@ class GeneticAlgorithmApp():
 
 
         # Первая популяция
-        self.env.generate_random_agents(brain_class=Classic_NN_brain, number_of_agents=self.POPULATION_SIZE)
+        self.env.generate_random_agents(brain_class=Forward_NN_brain, number_of_agents=self.POPULATION_SIZE)
         self.env.generate_foods(self.MAX_NUMBER_OF_FOODS)
 
 
@@ -52,8 +53,18 @@ class GeneticAlgorithmApp():
             self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
             self.vis.visualize_all(self.env, self.stats)
 
-        # if excel_flag:
-        #     dict_df = pdd.DataFrame(list(my_dict.items()), columns=["Параметр", "Значение"])
+        if excel_flag:
+
+            header1 = pdd.DataFrame([["ENV parameters", ""]], columns=["Параметр", "Значение"])
+            env_df = pdd.DataFrame(list(env_parameters.items()), columns=["Параметр", "Значение"])
+
+            empty_row = pdd.DataFrame([["", ""]], columns=["Параметр", "Значение"])
+
+            header2 = pdd.DataFrame([["GA parameters", ""]], columns=["Параметр", "Значение"])
+            ga_df = pdd.DataFrame(list(ga_parameters.items()), columns=["Параметр", "Значение"])
+
+            
+            self.setting_df = pdd.concat([empty_row, header1, env_df, empty_row, header2, ga_df], ignore_index=True)
 
 
     def calculate_stats(self, agent_list, generation_number):
@@ -190,11 +201,12 @@ class GeneticAlgorithmApp():
             offspring_genomes.append(new_genome)
 
         return offspring_genomes
-    
+
 
     def blend_crossover(self, agent_list, probabilities, new_gen_size, alpha=0.1):
         offspring_genomes = []
         for i in range(new_gen_size):
+
             # SELECTION
             parent1_index = np.random.choice(len(agent_list), p=probabilities, replace=False)  # Без повторений
             parent2_index = np.random.choice(len(agent_list), p=probabilities, replace=False)  # Без повторений
@@ -286,9 +298,9 @@ class GeneticAlgorithmApp():
                     # offspring_genomes = self.blend_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
 
 
-                    # MUTATIONS IN AGENT'S BRAIN
+                    # MUTATIONS IN AGENT'S GENOME
                     brain_class = all_agents_list[0].brain.__class__
-                    offspring_genomes = [brain_class.mutate_genome(genome, percent=10) for genome in offspring_genomes]
+                    offspring_genomes = [brain_class.mutate_genome(genome, percent=self.mutation_percentage) for genome in offspring_genomes]
 
                     
                     # REPLACEMENT
@@ -318,14 +330,12 @@ class GeneticAlgorithmApp():
 
                 # рисуем парашу
                 self.vis.visualize_all(self.env, self.stats)
-                        
-
-        df.to_excel("output.xlsx", index=False)
+                    
 
 
         with pdd.ExcelWriter("output.xlsx") as writer:
             df.to_excel(writer, sheet_name="Статистика", index=False)
-            # dict_df.to_excel(writer, sheet_name="Статистика", index=False)
+            self.setting_df.to_excel(writer, sheet_name="Настройки", index=False)
 
 
 
@@ -403,7 +413,7 @@ class OpenEndedApp():
                 # Сначала выполняем 1 шаг/итерацию среды 
                 agent_list_before_step = self.env.make_step() # в этом списке могут быть мертвые и уже удаленные с карты агенты
 
-                if self.env.number_of_agents <= 0:
+                if Agent.number_of_agents <= 0:
                     
                     # print('НОВАЯ ГЕНЕРАЦИЯ')
                     self.env.distribute_agents_on_map([Programmatic_brain(genome=self.viable_genome)])
