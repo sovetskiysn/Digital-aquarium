@@ -11,7 +11,7 @@ from visualization.parameters import *
 
 # В этом файле я планирую написать разные классыи приложений потому-что иногда мне надо запускать open-ended, 
 # иногда Genetic algorithm с каким-то определенным Selection, в другой момент GA с другим Selection
-
+   
 
 
 
@@ -269,7 +269,7 @@ class GeneticAlgorithmApp():
         return offspring_genomes
 
     
-    def run(self):
+    def run(self, file_name='output.xlsx', selection_int=1, crossover_int=1):
         all_agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
 
@@ -322,17 +322,25 @@ class GeneticAlgorithmApp():
 
                         
                     # SELECTION
-                    # mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
-                    # mating_pool, probabilities = self.rank_selection(all_agents_list)
-                    # mating_pool, probabilities = self.elitism_selection(all_agents_list)
-                    mating_pool, probabilities = self.fitness_proportionate_elitism_selection(all_agents_list, elite_count=5)
+                    if selection_int == 1:
+                        mating_pool, probabilities = self.elitism_selection(all_agents_list, elite_count=5)
+                    elif selection_int == 2:
+                        mating_pool, probabilities = self.rank_selection(all_agents_list)
+                    elif selection_int == 3:
+                        mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
+                    elif selection_int == 4:
+                        mating_pool, probabilities = self.fitness_proportionate_elitism_selection(all_agents_list, elite_count=5)
 
 
                     # CROSSOVER
-                    # offspring_genomes = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
-                    # offspring_genomes = self.arithmetic_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
-                    # offspring_genomes = self.blend_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
-                    offspring_genomes = self.clone_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    if crossover_int == 1:
+                        offspring_genomes = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    elif crossover_int == 2:
+                        offspring_genomes = self.arithmetic_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    elif crossover_int == 3:
+                        offspring_genomes = self.blend_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
+                    elif crossover_int == 4:
+                        offspring_genomes = self.clone_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
 
 
                     # MUTATIONS IN AGENT'S GENOME
@@ -369,10 +377,8 @@ class GeneticAlgorithmApp():
 
                 # рисуем парашу
                 self.vis.visualize_all(self.env, self.stats)
-                    
 
-
-        with pdd.ExcelWriter("output.xlsx") as writer:
+        with pdd.ExcelWriter(file_name) as writer:
             df.to_excel(writer, sheet_name="Статистика", index=False)
             self.setting_df.to_excel(writer, sheet_name="Настройки", index=False)
 
