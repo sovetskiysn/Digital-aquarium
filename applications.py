@@ -17,7 +17,7 @@ from visualization.parameters import *
 
 
 class GeneticAlgorithmApp():
-    def __init__(self, env_parameters, ga_parameters, visualization_flag=True, excel_flag=True):
+    def __init__(self, env_parameters, ga_parameters, visualization_flag=True, excel_flag=True, selection_type='elitism', crossover_type='uniform'):
 
 
         # App parameters
@@ -53,6 +53,11 @@ class GeneticAlgorithmApp():
             self.vis = Visualization(self.NUM_OF_TILE_ROWS, self.NUM_OF_TILE_COLS)
             self.vis.visualize_all(self.env, self.stats)
 
+
+        self.selection_type = selection_type
+        self.crossover_type = crossover_type
+        
+
         if excel_flag:
 
             header1 = pdd.DataFrame([["ENV parameters", ""]], columns=["Параметр", "Значение"])
@@ -63,8 +68,12 @@ class GeneticAlgorithmApp():
             header2 = pdd.DataFrame([["GA parameters", ""]], columns=["Параметр", "Значение"])
             ga_df = pdd.DataFrame(list(ga_parameters.items()), columns=["Параметр", "Значение"])
 
+            selection_row = pdd.DataFrame([["Selection", selection_type]], columns=["Параметр", "Значение"])
+            crossover_row = pdd.DataFrame([["Crossover", crossover_type]], columns=["Параметр", "Значение"])
             
-            self.setting_df = pdd.concat([empty_row, header1, env_df, empty_row, header2, ga_df], ignore_index=True)
+
+            
+            self.setting_df = pdd.concat([empty_row, header1, env_df, empty_row, header2, ga_df, selection_row, crossover_row], ignore_index=True)
 
 
     def calculate_stats(self, agent_list, generation_number, iteration_counter):
@@ -269,7 +278,7 @@ class GeneticAlgorithmApp():
         return offspring_genomes
 
     
-    def run(self, file_name='output.xlsx', selection_int=1, crossover_int=1):
+    def run(self, file_name='output.xlsx'):
         all_agents_list = self.env.get_specific_entities(Agent, return_type='instance_list')
 
 
@@ -322,24 +331,24 @@ class GeneticAlgorithmApp():
 
                         
                     # SELECTION
-                    if selection_int == 1:
+                    if self.selection_type == 'elitism':
                         mating_pool, probabilities = self.elitism_selection(all_agents_list, elite_count=5)
-                    elif selection_int == 2:
+                    elif self.selection_type == 'rank':
                         mating_pool, probabilities = self.rank_selection(all_agents_list)
-                    elif selection_int == 3:
+                    elif self.selection_type == 'fps':
                         mating_pool, probabilities = self.fitness_proportionate_selection(all_agents_list)
-                    elif selection_int == 4:
+                    elif self.selection_type == 'fpes':
                         mating_pool, probabilities = self.fitness_proportionate_elitism_selection(all_agents_list, elite_count=5)
 
 
                     # CROSSOVER
-                    if crossover_int == 1:
+                    if self.crossover_type == 'uniform':
                         offspring_genomes = self.uniform_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
-                    elif crossover_int == 2:
+                    elif self.crossover_type == 'arithmetic':
                         offspring_genomes = self.arithmetic_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
-                    elif crossover_int == 3:
+                    elif self.crossover_type == 'blend':
                         offspring_genomes = self.blend_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
-                    elif crossover_int == 4:
+                    elif self.crossover_type == 'clone':
                         offspring_genomes = self.clone_crossover(mating_pool, probabilities, new_gen_size=self.POPULATION_SIZE)
 
 
