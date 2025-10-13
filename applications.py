@@ -421,7 +421,7 @@ class OpenEndedApp():
         self.viable_genome = np.array([10 for i in range(16)])
 
         # 10% геном заменим на размножаться
-        self.viable_genome[np.random.choice(self.viable_genome.size, int(self.viable_genome.size * 0.1), replace=False)] = 0
+        self.viable_genome[np.random.choice(self.viable_genome.size, int(self.viable_genome.size * 0.4), replace=False)] = 0
 
         self.env.set_agent_at_location(coord, brain=Programmatic_brain(genome=self.viable_genome))
 
@@ -447,6 +447,7 @@ class OpenEndedApp():
 
         generation_counter = 1
 
+        step_counter = 0 
         while True:
                     
 
@@ -478,16 +479,16 @@ class OpenEndedApp():
 
                 self.stats['Avg of energy'] = int(np.average([agent.energy for agent in agents_list]))
 
+                step_counter += 1
 
-                print(f'len(agents_list) - {len(agents_list)}')
-                print(f'agents_list[0].genome - {agents_list[0].genome}')
+
 
 
 
 
             if self.visualization_flag:
 
-                self.stats['# of steps'] = self.env.step_counter
+                self.stats['# of steps'] = step_counter
                 self.stats['# of live agents'] = Agent.number_of_agents
                 self.stats['# of foods'] = Food.number_of_foods
                 self.stats['# of Gen'] = generation_counter

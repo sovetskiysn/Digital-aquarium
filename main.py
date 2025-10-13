@@ -27,11 +27,43 @@ ga_parameters = {
 
 
 
-app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=False, excel_flag=True, selection_type='elitism', crossover_type='uniform')
+app = GeneticAlgorithmApp(env_parameters, ga_parameters, visualization_flag=True, excel_flag=True, selection_type='elitism', crossover_type='uniform')
 app.run(file_name='mutation_low2.xlsx')
 
 selection_type = ['elitism', 'rank', 'fps', 'fpes']
 crossover_type = ['uniform', 'arithmetic', 'blend', 'clone']
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # ============================================================
