@@ -4,19 +4,13 @@
 Для обучения этой нейросети используется классический генетический алгоритм.
 
 III место на 2025 IEEE AITU: Digital Generation
+
 Sovet Sanzhar, Nurakhov Edil, Aitolkyn Kulmuratova, Evolution of agents in a virtual environment using neural networks and genetic algorithm
 
-На данный еще не опубликована
-
-На данный момент статья по проекту еще не выложена
+есть Thesis.pdf файл с подробным описанием всего
 
 ![Демо анимация](images/Show.gif)
 
 ![Сертификат](images/certificate.jpg)
 
 Python 3.12.5
-
-Моменты над которыми надо подумать:
-
-- баг с (-2, ??) координатами
-- можно попробывать уменьшить количество кода в bite если got_bitten будет сначала заменять себя на under_reference, а затем делать просто move
