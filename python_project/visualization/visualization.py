@@ -122,7 +122,7 @@ class Visualization():
 
 
     def calculate_time_delta(self):
-        self.time_delta = self.clock.tick()/1000.0
+        self.time_delta = self.clock.tick(60)/1000.0
 
 
 
