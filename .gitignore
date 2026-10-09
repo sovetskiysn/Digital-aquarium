@@ -1,0 +1,23 @@
+# python_project
+python_project/.venv/
+python_project/__pycache__/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+python_project/.env
+
+# latex_documents: build artifacts
+# LaTeX Workshop is configured (.vscode/settings.json) to drop aux files here
+latex_documents/**/.build/
+latex_documents/**/*.aux
+latex_documents/**/*.log
+latex_documents/**/*.out
+latex_documents/**/*.fls
+latex_documents/**/*.fdb_latexmk
+latex_documents/**/*.synctex.gz
+latex_documents/**/*.bbl
+latex_documents/**/*.blg
+latex_documents/**/*.toc
+
+# OS noise
+.DS_Store
