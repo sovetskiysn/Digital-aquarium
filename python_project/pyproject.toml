@@ -8,11 +8,8 @@ dependencies = [
     "pandas==2.2.2",
     "pygame==2.6.1",
     "pygame-gui==0.6.13",
-    # На текущей машине нет GPU, поэтому используем CPU-сборку.
-    "torch==2.6.0+cpu",
-    # Для будущей машины с NVIDIA GPU: заменить CPU-сборку этой строкой
-    # и переключить источник torch и индекс ниже, затем выполнить uv lock.
-    # "torch==2.6.0+cu126",
+    "torch==2.6.0+cpu",    # Сейчас GPU нет.
+    # "torch==2.6.0+cu126", # Если появится NVIDIA GPU.
 ]
 
 [tool.uv]
@@ -27,7 +24,6 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
-# Индекс для будущего запуска на машине с NVIDIA GPU (CUDA 12.6).
 # [[tool.uv.index]]
 # name = "pytorch-cu126"
 # url = "https://download.pytorch.org/whl/cu126"
