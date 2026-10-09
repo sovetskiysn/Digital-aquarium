@@ -45,8 +45,9 @@ Git-репозиторий находится в корне рабочей па�
 - Python 3.12, зависимости для uv в `pyproject.toml` (pygame, pygame_gui,
   numpy, torch, pandas); точные версии закреплены в `uv.lock`.
 - Установка: `cd python_project && uv sync --locked`; запуск: `uv run main.py`.
-- `torch==2.6.0+cu126` для uv привязан к отдельному индексу PyTorch
-  `https://download.pytorch.org/whl/cu126` через `tool.uv.sources`.
+- На текущей машине нет GPU: `torch==2.6.0+cpu` для uv привязан к индексу
+  `https://download.pytorch.org/whl/cpu` через `tool.uv.sources`.
+  Вариант CUDA 12.6 оставлен в комментариях в `pyproject.toml` на будущее.
 - `requirements.txt` сохранён в UTF-16 — `pip install -r` на нём падает, пока
   файл не перекодирован в UTF-8.
 - Виртуальное окружение — `python_project/.venv/` (в `.gitignore`).

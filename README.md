@@ -27,8 +27,9 @@ uv run main.py
 ```
 
 Зависимости описаны в `python_project/pyproject.toml`, точные версии закреплены
-в `python_project/uv.lock`. Для `torch==2.6.0+cu126` настроен отдельный индекс
-PyTorch с CUDA 12.6 (Linux/Windows).
+в `python_project/uv.lock`. На текущей машине нет GPU, поэтому используется
+`torch==2.6.0+cpu` из CPU-индекса PyTorch. Вариант с CUDA 12.6 для будущей
+машины с NVIDIA GPU оставлен в комментариях в `pyproject.toml`.
 
 Приложение открывает окно pygame. При запуске по SSH нужен X11-проброс;
 для запуска без экрана можно использовать `xvfb-run uv run main.py`.
