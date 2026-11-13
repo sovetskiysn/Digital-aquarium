@@ -9,8 +9,8 @@ Sovet Sanzhar, Nurakhov Edil, Aitolkyn Kulmuratova, Evolution of agents in a vir
 
 есть Thesis.pdf файл с подробным описанием всего
 
-![Демо анимация](images/Show.gif)
+![Демо анимация](assets/Show.gif)
 
-![Сертификат](images/certificate.jpg)
+![Сертификат](assets/certificate.jpg)
 
 Python 3.12.5
